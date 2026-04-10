@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>RL HUB</title>
+<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiUkwgSFVCIiwic2hvcnRfbmFtZSI6IlJMIEhVQiIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMGEwZTFhIiwidGhlbWVfY29sb3IiOiIjZmY4YzAwIn0=">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--bg2:#0f1525;--bg3:#151c30;--bg4:#1c2540;--card:#131a2e;--card-border:rgba(255,140,0,.12);--text:#e0ddd8;--text2:#8a8580;--text3:#4a4540;--accent:#ff8c00;--accent2:#ff6600;--accent-glow:rgba(255,140,0,.25);--blue:#1e90ff;--blue2:#0066cc;--glass:rgba(15,21,37,.88);--glass-border:rgba(255,255,255,.06);--green:#4caf50;--red:#f44336;--amber:#ff9800;--purple:#9c27b0;--shadow:0 4px 24px rgba(0,0,0,.6);--radius:12px;--radius-sm:8px}
+[data-theme="amoled"]{--bg:#000;--bg2:#050508;--bg3:#0a0d14;--bg4:#12161e;--card:#050508;--card-border:rgba(255,140,0,.08)}
+[data-theme="light"]{--bg:#e4e0db;--bg2:#ece8e3;--bg3:#f4f0eb;--bg4:#fff;--card:#fff;--card-border:rgba(0,0,0,.1);--text:#1a1a1a;--text2:#555;--text3:#999;--glass:rgba(255,255,255,.88);--glass-border:rgba(0,0,0,.06);--shadow:0 4px 24px rgba(0,0,0,.1)}
+[data-accent="blue"]{--accent:#1e90ff;--accent2:#0066cc;--accent-glow:rgba(30,144,255,.25)}
+[data-accent="green"]{--accent:#4caf50;--accent2:#388e3c;--accent-glow:rgba(76,175,80,.25)}
+[data-accent="purple"]{--accent:#9c27b0;--accent2:#7b1fa2;--accent-glow:rgba(156,39,176,.25)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Exo 2',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
+h1,h2,h3,h4,h5{font-family:'Rajdhani',sans-serif;font-weight:700}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--accent);border-radius:4px}
+canvas#pC{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.2}
+#app{position:relative;z-index:1;max-width:600px;margin:0 auto;min-height:100vh;padding-bottom:60px}
+.logo-sec{text-align:center;padding:18px 16px 4px}
+.logo-wrap{position:relative;width:130px;height:130px;margin:0 auto;cursor:pointer}
+.logo-svg{width:100%;height:100%}
+.logo-outer{animation:rotO 20s linear infinite;transform-origin:center}
+.logo-mid{animation:rotO 28s linear infinite reverse;transform-origin:center}
+@keyframes rotO{to{transform:rotate(360deg)}}
+.logo-ball-pulse{animation:bp 2.5s ease-in-out infinite alternate}
+@keyframes bp{from{opacity:.7}to{opacity:1}}
+.logo-boost{animation:bf 0.3s ease-in-out infinite alternate}
+@keyframes bf{from{opacity:.5;transform:scaleX(.9)}to{opacity:.9;transform:scaleX(1.1)}}
+.logo-ch{animation:ch 5s ease-in-out infinite alternate}
+@keyframes ch{0%{opacity:.3}50%{opacity:.9}100%{opacity:.3}}
+.crt-ov{position:absolute;inset:0;pointer-events:none;opacity:0;animation:crt 1.5s ease-out .3s forwards}
+@keyframes crt{0%{opacity:1;filter:brightness(0)}10%{filter:brightness(2)}15%{filter:brightness(0)}25%{filter:brightness(1.5)}35%{filter:brightness(.2)}50%{filter:brightness(1)}100%{opacity:0}}
+.brand-row{display:flex;align-items:baseline;justify-content:center;gap:4px;margin-top:5px}
+.brand-rl{font-family:'Rajdhani',sans-serif;font-size:2.1rem;font-weight:700;background:linear-gradient(135deg,#ff8c00,#ff6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand-hub{font-family:'Rajdhani',sans-serif;font-size:1.5rem;font-weight:700;color:transparent;-webkit-text-stroke:1.5px var(--accent);letter-spacing:.12em}
+.brand-sep{width:110px;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:3px auto}
+.brand-sub-row{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:2px}
+.brand-sub{font-family:'Exo 2',sans-serif;font-size:.72rem;color:var(--text2);letter-spacing:.1em;text-shadow:0 0 8px var(--accent-glow)}
+.online-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:dp 2s ease-in-out infinite}
+@keyframes dp{0%,100%{box-shadow:0 0 0 0 rgba(76,175,80,.6)}50%{box-shadow:0 0 0 5px rgba(76,175,80,0)}}
+.hero{width:100%;height:200px;position:relative;overflow:hidden;background:var(--bg2)}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease}
+.hero-slide.active{opacity:1}
+.hero-bg{position:absolute;top:-5%;left:-5%;width:110%;height:110%;background-size:cover;background-position:center;animation:kb 10s ease-in-out infinite alternate}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.06)}}
+.hero-ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.7) 70%,rgba(10,14,26,.95))}
+.hero-ct{position:relative;z-index:2;padding:10px 14px;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+.hero-name{font-family:'Rajdhani',sans-serif;font-size:1.4rem;font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+.hero-badge{position:absolute;top:10px;right:10px;z-index:3;background:var(--accent);color:#000;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.75rem;padding:2px 8px;border-radius:4px}
+.hero-arrows{position:absolute;top:50%;transform:translateY(-50%);z-index:4;width:100%;display:flex;justify-content:space-between;padding:0 8px;pointer-events:none}
+.hero-arrow{pointer-events:all;background:rgba(0,0,0,.5);color:#fff;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;border:none}
+.hero-dots{position:absolute;bottom:48px;left:50%;transform:translateX(-50%);z-index:4;display:flex;gap:5px}
+.hero-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s}
+.hero-dot.active{background:var(--accent);width:18px;border-radius:4px}
+.stats-bar{position:relative;z-index:3;display:flex;gap:3px;padding:7px 10px;background:var(--glass);backdrop-filter:blur(12px);border-top:1px solid var(--glass-border);overflow-x:auto}
+.stat-i{display:flex;align-items:center;gap:3px;font-size:.65rem;color:var(--text2);white-space:nowrap;padding:3px 7px;background:rgba(255,255,255,.03);border-radius:5px;flex-shrink:0}
+.stat-v{color:var(--accent);font-weight:600;font-family:'Rajdhani',sans-serif;font-size:.8rem}
+.tab-bar{display:flex;overflow-x:auto;background:var(--bg2);border-bottom:1px solid var(--glass-border);position:sticky;top:0;z-index:10;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:9px 12px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.74rem;color:var(--text3);background:none;border:none;cursor:pointer;position:relative;white-space:nowrap;transition:color .2s}
+.tab-btn.active{color:var(--accent)}
+.tab-btn.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent)}
+.tc{display:none;padding:10px;animation:fi .3s ease}
+.tc.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.sw{padding:0 10px 6px;position:sticky;top:40px;z-index:9;background:var(--bg)}
+.sw input{width:100%;padding:8px 14px 8px 34px;background:var(--bg3);border:1px solid var(--glass-border);border-radius:var(--radius);color:var(--text);font-family:'Exo 2',sans-serif;font-size:.8rem;outline:none}
+.sw input:focus{border-color:var(--accent)}
+.sw .si{position:absolute;left:22px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.8rem}
+.card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden;margin-bottom:8px;transition:transform .15s}
+.card:active{transform:scale(.985)}
+.card-h{position:relative;padding:10px 12px;background:var(--bg3);cursor:pointer;display:flex;align-items:center;gap:8px}
+.card-h::after{content:'\25BC';margin-left:auto;font-size:.5rem;color:var(--text3);transition:transform .2s}
+.card.open .card-h::after{transform:rotate(180deg)}
+.card-body{display:none;padding:10px}
+.card.open .card-body{display:block}
+.fb{display:flex;gap:4px;margin-bottom:8px;overflow-x:auto;padding-bottom:3px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.fb::-webkit-scrollbar{display:none}
+.fbtn{flex-shrink:0;padding:4px 10px;background:var(--bg3);border:1px solid var(--glass-border);border-radius:18px;color:var(--text2);font-size:.67rem;font-family:'Exo 2',sans-serif;cursor:pointer;transition:all .2s;white-space:nowrap}
+.fbtn.active{background:var(--accent);color:#000;border-color:var(--accent)}
+select.fsel{padding:4px 7px;background:var(--bg3);border:1px solid var(--glass-border);border-radius:var(--radius-sm);color:var(--text);font-size:.7rem;font-family:'Exo 2',sans-serif;outline:none;flex-shrink:0}
+.btn{padding:6px 13px;background:var(--accent);color:#000;border:none;border-radius:var(--radius-sm);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.btn:active{transform:scale(.96)}
+.btn-o{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+.btn-s{padding:3px 9px;font-size:.7rem}
+.btn-d{background:var(--red);color:#fff}
+.stitle{font-family:'Rajdhani',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:5px}
+.mech-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);overflow:hidden;margin-bottom:7px}
+.mech-h{padding:8px 10px;display:flex;align-items:center;gap:8px;cursor:pointer}
+.mech-h::after{content:'\25BC';margin-left:auto;font-size:.45rem;color:var(--text3)}
+.mech-card.open .mech-h::after{transform:rotate(180deg)}
+.mech-diff{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.75rem;flex-shrink:0}
+.mech-name{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.88rem}
+.mech-cat{font-size:.58rem;color:var(--text3)}
+.mech-status{font-size:.58rem;padding:1px 6px;border-radius:8px;font-weight:600;flex-shrink:0}
+.mech-status.mastered{background:var(--green);color:#fff}
+.mech-status.learning{background:var(--accent);color:#000}
+.mech-status.next{background:var(--blue);color:#fff}
+.mech-status.later{background:var(--bg4);color:var(--text3)}
+.mech-body{display:none;padding:10px;border-top:1px solid var(--glass-border)}
+.mech-card.open .mech-body{display:block}
+.mech-desc{font-size:.75rem;color:var(--text2);margin-bottom:6px;line-height:1.4}
+.mech-step{font-size:.72rem;padding:4px 6px;background:var(--bg3);border-radius:var(--radius-sm);margin-bottom:3px;border-left:2px solid var(--accent)}
+.mech-tip{font-size:.7rem;color:var(--accent);padding:4px 6px;background:rgba(255,140,0,.06);border-radius:var(--radius-sm);margin-top:4px}
+.mech-links{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.econ-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px;margin-bottom:7px}
+.econ-val{font-family:'Rajdhani',sans-serif;font-size:1.3rem;font-weight:700;color:var(--accent)}
+.econ-lbl{font-size:.65rem;color:var(--text2);margin-bottom:1px}
+.pro-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px;margin-bottom:6px}
+.pro-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.95rem}
+.pro-team{font-size:.62rem;color:var(--text3)}
+.pro-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px}
+.pro-stat{font-size:.68rem;color:var(--text2)}.pro-stat b{color:var(--text);font-weight:600}
+.timer-block{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px;margin-bottom:6px}
+.timer-name{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.88rem;margin-bottom:4px}
+.timer-time{font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:var(--accent)}
+.timer-btns{display:flex;gap:4px;margin-top:4px}
+.goal-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px;margin-bottom:6px}
+.goal-bar-bg{height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:4px}
+.goal-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .5s}
+.pack-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.pack-code{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;color:var(--accent);cursor:pointer;padding:3px 8px;background:var(--bg3);border-radius:var(--radius-sm)}
+.rank-section{margin-bottom:10px}
+.rank-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:8px;font-size:.65rem;font-weight:700;font-family:'Rajdhani',sans-serif}
+.fun-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:12px;margin-bottom:7px;text-align:center}
+.fun-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:5px}
+.slot-machine{display:flex;gap:3px;justify-content:center;margin:8px 0}
+.slot-reel{width:80px;height:36px;background:var(--bg3);border-radius:var(--radius-sm);overflow:hidden;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.65rem;border:1px solid var(--glass-border)}
+.bingo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin:6px 0}
+.bingo-cell{padding:4px 2px;background:var(--bg3);border-radius:3px;font-size:.48rem;text-align:center;cursor:pointer;border:1px solid var(--glass-border);line-height:1.15;min-height:32px;display:flex;align-items:center;justify-content:center}
+.bingo-cell.marked{background:var(--accent);color:#000;border-color:var(--accent)}
+.tierlist-row{display:flex;align-items:stretch;margin-bottom:2px}
+.tier-label{width:28px;display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;border-radius:3px 0 0 3px;flex-shrink:0}
+.tier-items{flex:1;min-height:28px;background:var(--bg3);border-radius:0 3px 3px 0;padding:2px;display:flex;flex-wrap:wrap;gap:2px;align-items:center}
+.tier-chip{padding:1px 5px;background:var(--bg4);border-radius:3px;font-size:.55rem;cursor:pointer;white-space:nowrap}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);margin-bottom:5px}
+.slbl{font-size:.8rem}.sdesc{font-size:.62rem;color:var(--text3)}
+.tg{display:flex;gap:2px}
+.topt{padding:3px 8px;background:var(--bg3);border:1px solid var(--glass-border);border-radius:var(--radius-sm);font-size:.65rem;cursor:pointer;color:var(--text2);font-family:'Exo 2',sans-serif}
+.topt.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.sinput{padding:4px 7px;background:var(--bg3);border:1px solid var(--glass-border);border-radius:var(--radius-sm);color:var(--text);font-size:.75rem;outline:none;width:110px;font-family:'Exo 2',sans-serif}
+.sinput:focus{border-color:var(--accent)}
+.toast{position:fixed;bottom:65px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--bg4);border:1px solid var(--card-border);color:var(--text);padding:7px 16px;border-radius:var(--radius);font-size:.75rem;z-index:100;transition:transform .3s;box-shadow:var(--shadow);pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.load-bar{width:80%;max-width:280px;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.load-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s;width:0}
+.chart-row{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.chart-lbl{font-size:.58rem;color:var(--text3);width:26px;text-align:right;flex-shrink:0}
+.chart-bg{flex:1;height:12px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.chart-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px}
+.chart-v{font-size:.58rem;color:var(--text2);width:36px;flex-shrink:0}
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin:6px 0}
+.heat-cell{width:100%;aspect-ratio:1;border-radius:2px;background:var(--bg3)}
+.confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:200}
+.cosm-card{background:var(--card);border:1px solid var(--card-border);border-radius:var(--radius);padding:8px;margin-bottom:5px;display:flex;gap:8px;align-items:center}
+.cosm-img{width:48px;height:48px;background:var(--bg3);border-radius:var(--radius-sm);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.55rem;color:var(--text3)}
+.cosm-info{flex:1;min-width:0}
+.cosm-name{font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cosm-meta{font-size:.6rem;color:var(--text3)}
+.cosm-val{font-size:.68rem;color:var(--accent);font-weight:600}
+.cosm-acts{display:flex;gap:4px;flex-shrink:0}
+.tilt-warn{padding:10px;background:rgba(244,67,54,.1);border:1px solid var(--red);border-radius:var(--radius);margin-bottom:7px;text-align:center}
+.session-entry{display:flex;gap:6px;padding:5px 6px;background:var(--bg3);border-radius:var(--radius-sm);margin-bottom:3px;font-size:.7rem;align-items:center}
+@media(max-width:400px){.logo-wrap{width:100px;height:100px}.brand-rl{font-size:1.6rem}.brand-hub{font-size:1.1rem}.hero{height:155px}.tab-btn{padding:7px 9px;font-size:.68rem}}
+</style>
+</head>
+<body data-theme="dark" data-accent="orange">
+<canvas id="pC"></canvas>
+<div class="loading-overlay" id="loadOv">
+<div style="font-family:Rajdhani,sans-serif;font-size:1rem;color:var(--text2)" id="loadTxt">Loading RL HUB...</div>
+<div class="load-bar"><div class="load-fill" id="loadBar"></div></div>
+<div style="font-size:.68rem;color:var(--text3)" id="loadSub">Preparing database</div>
+</div>
+<div id="app" style="display:none">
+<div class="logo-sec">
+<div class="logo-wrap" id="logoWrap">
+<svg class="logo-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="og" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff8c00"/><stop offset="100%" stop-color="#ff6600"/></linearGradient><clipPath id="iC"><circle cx="100" cy="100" r="50"/></clipPath></defs>
+<line x1="8" y1="8" x2="28" y2="8" stroke="url(#og)" stroke-width="1.5" opacity=".6"/>
+<line x1="8" y1="8" x2="8" y2="28" stroke="url(#og)" stroke-width="1.5" opacity=".6"/>
+<line x1="192" y1="8" x2="172" y2="8" stroke="url(#og)" stroke-width="1.5" opacity=".6"/>
+<line x1="192" y1="8" x2="192" y2="28" stroke="url(#og)" stroke-width="1.5" opacity=".6"/>
+<line x1="8" y1="192" x2="28" y2="192" stroke="url(#og)" stroke-width="1.5" opacity=".6"/>
+<line x1="8" y1="192" x2="8" y2="172" stroke="url(#og)" stroke-width="1.5" opacity=".6"/>
+<line x1="192" y1="192" x2="172" y2="192" stroke="url(#og)" stroke-width="1.5" opacity=".6"/>
+<line x1="192" y1="192" x2="192" y2="172" stroke="url(#og)" stroke-width="1.5" opacity=".6"/>
+<g class="logo-outer">
+<circle cx="100" cy="100" r="86" fill="none" stroke="url(#og)" stroke-width="3" stroke-dasharray="5 3" filter="drop-shadow(0 0 3px rgba(255,140,0,.3))"/>
+<line x1="100" y1="7" x2="100" y2="18" stroke="#f44336" stroke-width="1.5" opacity=".6"/>
+<line x1="100" y1="182" x2="100" y2="193" stroke="#f44336" stroke-width="1.5" opacity=".6"/>
+<line x1="7" y1="100" x2="18" y2="100" stroke="#f44336" stroke-width="1.5" opacity=".6"/>
+<line x1="182" y1="100" x2="193" y2="100" stroke="#f44336" stroke-width="1.5" opacity=".6"/>
+</g>
+<g class="logo-mid">
+<circle cx="100" cy="100" r="66" fill="none" stroke="url(#og)" stroke-width="1" opacity=".4"/>
+<text x="100" y="30" text-anchor="middle" fill="url(#og)" font-family="Rajdhani,sans-serif" font-size="8" font-weight="700" opacity=".5">N</text>
+<text x="100" y="176" text-anchor="middle" fill="url(#og)" font-family="Rajdhani,sans-serif" font-size="8" font-weight="700" opacity=".5">S</text>
+<text x="26" y="104" text-anchor="middle" fill="url(#og)" font-family="Rajdhani,sans-serif" font-size="8" font-weight="700" opacity=".5">W</text>
+<text x="174" y="104" text-anchor="middle" fill="url(#og)" font-family="Rajdhani,sans-serif" font-size="8" font-weight="700" opacity=".5">E</text>
+</g>
+<circle cx="100" cy="100" r="50" fill="#0a1628"/>
+<g clip-path="url(#iC)" opacity=".12">
+<line x1="50" y1="55" x2="150" y2="55" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="61" x2="150" y2="61" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="67" x2="150" y2="67" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="73" x2="150" y2="73" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="79" x2="150" y2="79" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="85" x2="150" y2="85" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="91" x2="150" y2="91" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="97" x2="150" y2="97" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="103" x2="150" y2="103" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="109" x2="150" y2="109" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="115" x2="150" y2="115" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="121" x2="150" y2="121" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="127" x2="150" y2="127" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="133" x2="150" y2="133" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="139" x2="150" y2="139" stroke="#ff8c00" stroke-width=".4"/>
+<line x1="50" y1="145" x2="150" y2="145" stroke="#ff8c00" stroke-width=".4"/>
+</g>
+<g transform="translate(100,106) scale(.38)" fill="url(#og)" opacity=".85">
+<rect x="-42" y="-8" width="84" height="16" rx="3"/>
+<rect x="-36" y="-16" width="72" height="8" rx="2" opacity=".7"/>
+<rect x="-30" y="-20" width="24" height="6" rx="1" opacity=".5"/>
+<circle cx="-26" cy="12" r="8" fill="none" stroke="url(#og)" stroke-width="2.5"/>
+<circle cx="26" cy="12" r="8" fill="none" stroke="url(#og)" stroke-width="2.5"/>
+<g class="logo-boost" transform="translate(-50,-2)"><polygon points="-2,-5 -12,0 -2,5" fill="#ff4400" opacity=".7"/></g>
+</g>
+<g class="logo-ball-pulse" transform="translate(115,80)">
+<circle cx="0" cy="0" r="14" fill="none" stroke="url(#og)" stroke-width="1.5"/>
+<line x1="-10" y1="0" x2="10" y2="0" stroke="url(#og)" stroke-width="1" opacity=".5"/>
+<line x1="0" y1="-10" x2="0" y2="10" stroke="url(#og)" stroke-width="1" opacity=".5"/>
+<path d="M-7,-10 Q0,-14 7,-10" fill="none" stroke="url(#og)" stroke-width=".8" opacity=".4"/>
+<path d="M-7,10 Q0,14 7,10" fill="none" stroke="url(#og)" stroke-width=".8" opacity=".4"/>
+</g>
+<g class="logo-ch">
+<line x1="50" y1="100" x2="90" y2="100" stroke="url(#og)" stroke-width=".7" opacity=".4"/>
+<line x1="110" y1="100" x2="150" y2="100" stroke="url(#og)" stroke-width=".7" opacity=".4"/>
+<line x1="100" y1="50" x2="100" y2="90" stroke="url(#og)" stroke-width=".7" opacity=".4"/>
+<line x1="100" y1="110" x2="100" y2="150" stroke="url(#og)" stroke-width=".7" opacity=".4"/>
+</g>
+</svg>
+<div class="crt-ov" style="background:var(--accent)"></div>
+</div>
+<div class="brand-row"><span class="brand-rl">RL</span><span class="brand-hub">HUB</span></div>
+<div class="brand-sep"></div>
+<div class="brand-sub-row"><div class="online-dot"></div><span class="brand-sub">Mffnpffn // Gold 3</span></div>
+</div>
+<div class="hero" id="hero"></div>
+<div class="tab-bar" id="tabBar"></div>
+<div class="sw" style="position:relative"><span class="si">&#128269;</span><input id="gSearch" type="text" placeholder="Search mechanics, cosmetics, packs..."></div>
+<div class="tc active" id="tc-mechanics"></div>
+<div class="tc" id="tc-cosmetics"></div>
+<div class="tc" id="tc-garage"></div>
+<div class="tc" id="tc-pros"></div>
+<div class="tc" id="tc-tracker"></div>
+<div class="tc" id="tc-routine"></div>
+<div class="tc" id="tc-goals"></div>
+<div class="tc" id="tc-packs"></div>
+<div class="tc" id="tc-rankguide"></div>
+<div class="tc" id="tc-fun"></div>
+<div class="tc" id="tc-settings"></div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+"use strict";
+var TABS=[{id:"mechanics",l:"Mechanics"},{id:"cosmetics",l:"Cosmetics"},{id:"garage",l:"Garage"},{id:"pros",l:"Pro Settings"},{id:"tracker",l:"Tracker"},{id:"routine",l:"Routine"},{id:"goals",l:"Goals"},{id:"packs",l:"Packs"},{id:"rankguide",l:"Rank Guide"},{id:"fun",l:"Fun"},{id:"settings",l:"Settings"}];
+
+var MECHS=[
+{n:"Front Flip",cat:"Movement",diff:1,desc:"Basic forward dodge for speed.",steps:["Jump","Tilt stick forward","Dodge"],tip:"Use for quick recovery.",pack:"",status:"mastered"},
+{n:"Side Flip",cat:"Movement",diff:1,desc:"Dodge sideways for positioning.",steps:["Jump","Tilt stick left/right","Dodge"],tip:"Great for adjusting on defense.",pack:"",status:"mastered"},
+{n:"Fast Aerial",cat:"Aerial",diff:4,desc:"Reach the ball faster by boosting and jumping simultaneously.",steps:["Jump + boost + tilt back","Second jump while boosting","Level out and fly to ball"],tip:"Hold boost through both jumps for maximum speed.",pack:"A7F0-11DE-4E7C-AC79",status:"mastered"},
+{n:"Wave Dash",cat:"Movement",diff:5,desc:"Land with a diagonal flip to maintain momentum without using boost.",steps:["Jump from ground or fall from air","Angle car so back wheels touch first","Dodge forward as back wheels land"],tip:"Use off walls for incredible speed.",pack:"",status:"mastered"},
+{n:"Speed Flip",cat:"Movement",diff:6,desc:"Fastest way to reach supersonic from standstill.",steps:["Diagonal flip forward-left or forward-right","Immediately cancel the flip by pulling stick opposite","Boost throughout the entire flip"],tip:"Essential for kickoffs at Gold+.",pack:"A503-264C-A7EB-D282",status:"mastered"},
+{n:"Half Flip",cat:"Movement",diff:5,desc:"Quickly turn 180 degrees without losing momentum.",steps:["Backflip","Cancel flip by holding stick forward at halfway point","Air roll 180 to land on wheels"],tip:"Bind air roll left or right for consistency.",pack:"",status:"learning"},
+{n:"Air Dribble",cat:"Dribbling",diff:7,desc:"Carry the ball through the air by matching its speed and tapping it.",steps:["Pop ball off wall or ground with matching trajectory","Boost gently to stay under ball","Soft touches to guide ball toward goal"],tip:"Focus on matching ball speed, not hitting it hard.",pack:"9F6D-4387-4C57-2A4B",status:"learning"},
+{n:"Ceiling Shot",cat:"Aerial",diff:7,desc:"Drive on ceiling, fall off, and hit ball with unlimited flip time.",steps:["Drive up wall and onto ceiling","Drive along ceiling toward ball","Fall off and use flip to hit ball with power"],tip:"You keep your flip until you jump - just drive off the ceiling.",pack:"",status:"next"},
+{n:"Musty Flick",cat:"Flicks",diff:7,desc:"Nose-down backflip that flicks ball forward at incredible speed.",steps:["Dribble ball on car roof","Lean car nose down slightly","Backflip - the car nose hits ball forward with massive power"],tip:"The steeper the nose angle, the more power.",pack:"",status:"next"},
+{n:"Ground Dribble",cat:"Dribbling",diff:4,desc:"Balance ball on top of car while driving.",steps:["Match ball speed with car","Get under ball so it sits on roof","Make small adjustments to keep ball centered"],tip:"Use ball cam off for dribbling.",pack:"",status:"mastered"},
+{n:"Power Slide Cut",cat:"Movement",diff:3,desc:"Sharp turn using powerslide for quick direction changes.",steps:["Hold powerslide","Turn hard","Release and boost out"],tip:"Faster than turning normally at any speed.",pack:"",status:"mastered"},
+{n:"Aerial",cat:"Aerial",diff:3,desc:"Fly through the air to hit the ball.",steps:["Jump","Tilt back and boost","Fly to ball and hit it"],tip:"Don't fly directly at the ball, aim where it will be.",pack:"",status:"mastered"},
+{n:"Wall Shot",cat:"Shooting",diff:4,desc:"Hit ball off the wall into the goal.",steps:["Drive up wall","Jump off wall at right moment","Boost and hit ball toward goal"],tip:"Jump off wall before the ball for better angle.",pack:"5CB2-6D82-1B54-47B1",status:"mastered"},
+{n:"Backboard Read",cat:"Defense",diff:5,desc:"Read and react to balls bouncing off the backboard.",steps:["Watch ball trajectory to backboard","Position where ball will bounce","Time jump to meet ball"],tip:"The ball usually bounces out at a predictable angle.",pack:"",status:"next"},
+{n:"Shadow Defense",cat:"Defense",diff:5,desc:"Match attacker speed while facing your goal to wait for mistake.",steps:["Turn and drive toward your goal ahead of attacker","Match their speed","Challenge when they make a mistake or lose control"],tip:"Don't commit until you have a clear challenge.",pack:"",status:"next"},
+{n:"Flick",cat:"Flicks",diff:5,desc:"Pop ball up from car roof with a dodge for shot.",steps:["Dribble ball on car","Jump while ball is on roof","Dodge into ball to flick it"],tip:"Front flip flick is most consistent for beginners.",pack:"",status:"learning"},
+{n:"Double Jump Aerial",cat:"Aerial",diff:3,desc:"Use both jumps quickly for faster aerial approach.",steps:["Jump","Immediately second jump","Boost to ball"],tip:"Faster than single jump but less control.",pack:"",status:"mastered"},
+{n:"Pinch",cat:"Shooting",diff:4,desc:"Squeeze ball between car and surface for powerful shot.",steps:["Line up ball against wall or ground","Drive into ball at angle that traps it","Ball shoots out at high speed"],tip:"Ground pinches can reach 100+ mph.",pack:"",status:"mastered"},
+{n:"Dribble Flick",cat:"Flicks",diff:6,desc:"Pop ball from car with flick to beat defenders.",steps:["Get ball on car roof","Drive toward defender","Jump and dodge to flick ball over them"],tip:"Vary your flick timing to be unpredictable.",pack:"",status:"learning"},
+{n:"Air Roll Shot",cat:"Aerial",diff:6,desc:"Rotate car while aerial to get better contact angles.",steps:["Aerial toward ball","Hold air roll while approaching","Time hit to direct ball on target"],tip:"Start with half spins before full air roll shots.",pack:"",status:"next"},
+{n:"Flip Reset",cat:"Resets",diff:8,desc:"Land all 4 wheels on ball mid-air to regain flip.",steps:["Aerial to ball","Position car so all 4 wheels touch ball","Use regained flip for powerful hit"],tip:"Approach from slightly below the ball.",pack:"",status:"later"},
+{n:"Breezi Flick",cat:"Advanced",diff:9,desc:"Tornado spin into a flick for unpredictable shots.",steps:["Dribble ball","Jump and start tornado spin","Flick at peak of spin"],tip:"Extremely hard to read for defenders.",pack:"",status:"later"},
+{n:"Stall",cat:"Advanced",diff:8,desc:"Cancel all momentum briefly in the air.",steps:["Air roll left + dodge right simultaneously","Car freezes briefly mid-air","Use for resets and redirects"],tip:"Requires air roll left/right bound separately.",pack:"",status:"later"},
+{n:"Ground to Air Dribble",cat:"Dribbling",diff:7,desc:"Pop ball from ground and carry it into the air.",steps:["Dribble ball on car","Pop ball up with jump","Follow ball and make gentle touches to guide it"],tip:"First touch is everything - too hard and you lose it.",pack:"",status:"later"},
+{n:"Tornado Spin",cat:"Advanced",diff:7,desc:"Combination of air roll and joystick for advanced control.",steps:["Hold air roll left or right","Move joystick in circular motion","Car spins on multiple axes simultaneously"],tip:"Practice in free play for 10 mins daily.",pack:"",status:"later"},
+{n:"Double Flip Reset",cat:"SSL Level",diff:10,desc:"Get two flip resets on the ball in one aerial play.",steps:["First flip reset on ball","Use flip to reposition","Second flip reset","Use final flip for shot"],tip:"Master single flip reset first.",pack:"",status:"later"},
+{n:"Ceiling Reset Musty",cat:"SSL Level",diff:10,desc:"Ceiling shot into flip reset into musty flick combo.",steps:["Drive onto ceiling","Fall off toward ball","Flip reset on ball","Musty flick with regained flip"],tip:"The ultimate combo - pure style points.",pack:"",status:"later"},
+{n:"Twisted Flip",cat:"SSL Level",diff:9,desc:"Air roll into a flip that changes ball trajectory unpredictably.",steps:["Aerial toward ball","Begin air rolling","Flip at specific angle to redirect"],tip:"Used for redirects that defenders cannot read.",pack:"",status:"later"},
+{n:"Serpentine Dribble",cat:"SSL Level",diff:9,desc:"Weave ball rapidly side to side at speed while dribbling.",steps:["Dribble ball on car","Make rapid small turns left and right","Maintain ball control throughout"],tip:"Start slow and increase speed gradually.",pack:"",status:"later"},
+{n:"Hover Control",cat:"SSL Level",diff:9,desc:"Maintain stationary position in the air with full control.",steps:["Aerial to position","Balance boost and gravity","Make micro-adjustments to stay in place"],tip:"Essential for advanced ceiling play and resets.",pack:"",status:"later"},
+{n:"Stall Redirect",cat:"SSL Level",diff:10,desc:"Use stall mechanic to redirect ball at unexpected angles.",steps:["Aerial toward ball","Stall just before contact","Use regained momentum for redirect"],tip:"Timing is everything - practice in custom training.",pack:"",status:"later"},
+{n:"Air Roll Shots Any Angle",cat:"SSL Level",diff:9,desc:"Hit accurate shots while fully air rolling from any approach angle.",steps:["Aerial with continuous air roll","Read ball position relative to car","Time boost and contact for accurate shot"],tip:"Spend 30 mins in free play daily with constant air roll.",pack:"",status:"later"},
+{n:"Bump/Demo Play",cat:"Movement",diff:3,desc:"Use car contact to disrupt opponents.",steps:["Identify target player","Boost into them at supersonic speed","Follow up on displaced ball"],tip:"Demos are a legitimate strategy, not toxic.",pack:"",status:"mastered"},
+{n:"Recovery",cat:"Movement",diff:3,desc:"Land on wheels quickly after being hit or aerial.",steps:["Air roll to align wheels down","Boost toward landing surface","Powerslide on landing to maintain speed"],tip:"Good recovery = more time on the ball.",pack:"",status:"mastered"},
+{n:"Redirect",cat:"Shooting",diff:6,desc:"Change ball direction mid-air for unpredictable shots.",steps:["Read teammate pass trajectory","Aerial to intercept","Hit ball at angle to redirect toward goal"],tip:"Position yourself perpendicular to the pass.",pack:"",status:"next"},
+{n:"Pre-Jump",cat:"Defense",diff:5,desc:"Jump to challenge before opponent shoots.",steps:["Read opponent setup","Jump before they shoot","Block shot at earliest point"],tip:"Risky but very effective when timed right.",pack:"",status:"next"},
+{n:"Bounce Dribble",cat:"Dribbling",diff:5,desc:"Let ball bounce and catch it on car repeatedly.",steps:["Let ball bounce once","Drive under as it comes down","Control speed to keep ball bouncing consistently"],tip:"Useful for resetting dribble control.",pack:"",status:"next"},
+{n:"Aerial Redirect",cat:"Aerial",diff:7,desc:"Change ball direction while airborne.",steps:["Read incoming ball","Aerial to intercept","Contact ball at angle to send toward goal"],tip:"Touch the side of ball for best redirects.",pack:"",status:"later"},
+{n:"Double Tap",cat:"Shooting",diff:7,desc:"Hit ball to backboard then follow up for goal.",steps:["Hit ball to opponents backboard","Follow the ball","Hit rebound into goal"],tip:"First touch should be firm, follow up touch soft.",pack:"",status:"later"},
+{n:"45 Degree Flick",cat:"Flicks",diff:6,desc:"Diagonal flick for unexpected angle shots.",steps:["Dribble ball","Turn car 45 degrees","Flick diagonally"],tip:"Hard to save due to unusual trajectory.",pack:"",status:"next"},
+{n:"Delayed Flick",cat:"Flicks",diff:6,desc:"Wait before flicking to bait defender jump.",steps:["Dribble toward defender","Jump but hold","Wait for defender to commit","Then flick"],tip:"Patience is the entire mechanic.",pack:"",status:"later"},
+{n:"Pop Mechanic",cat:"Shooting",diff:4,desc:"Pop ball up for teammate or follow up.",steps:["Drive under ball","Jump to pop it up","Let teammate or yourself follow up"],tip:"Communication is key in doubles and threes.",pack:"",status:"mastered"},
+{n:"50/50",cat:"Defense",diff:4,desc:"Challenge opponent directly for possession.",steps:["Drive directly at ball holder","Match their timing","Win possession through contact"],tip:"Flip into the ball at last moment for winning 50/50s.",pack:"",status:"mastered"},
+{n:"Powershot",cat:"Shooting",diff:3,desc:"Maximum power shot from ground.",steps:["Line up with ball","Front flip into ball","Contact ball with nose of car"],tip:"Dodge into ball at closest distance for max power.",pack:"",status:"mastered"},
+{n:"Hook Shot",cat:"Shooting",diff:5,desc:"Curve ball around defender with angled hit.",steps:["Approach ball from side","Hit ball at angle","Ball curves around defender toward goal"],tip:"Works great from corner approaches.",pack:"",status:"next"},
+{n:"Chain Dash",cat:"Movement",diff:6,desc:"Multiple wave dashes in succession for sustained speed.",steps:["Wave dash off surface","Immediately set up another","Chain them together for boost-free speed"],tip:"Essential for boost-starved rotations.",pack:"",status:"next"}
+];
+
+var COSMETICS_DB=[
+{n:"Fennec",type:"Car Bodies",rarity:"Import",series:"Totally Awesome",obtainable:true,value:300,consoleVal:350},
+{n:"Octane",type:"Car Bodies",rarity:"Common",series:"Default",obtainable:true,value:0,consoleVal:0},
+{n:"Dominus",type:"Car Bodies",rarity:"Import",series:"Default",obtainable:true,value:100,consoleVal:150},
+{n:"Titanium White Octane",type:"Car Bodies",rarity:"Import",series:"Trade Up",obtainable:true,value:8000,consoleVal:9500},
+{n:"Titanium White Fennec",type:"Car Bodies",rarity:"Import",series:"Totally Awesome",obtainable:true,value:5000,consoleVal:6000},
+{n:"Breakout",type:"Car Bodies",rarity:"Common",series:"Default",obtainable:true,value:0,consoleVal:0},
+{n:"Batmobile",type:"Car Bodies",rarity:"Premium",series:"DC",obtainable:false,value:0,consoleVal:0},
+{n:"DeLorean",type:"Car Bodies",rarity:"Premium",series:"BTTF",obtainable:false,value:0,consoleVal:0},
+{n:"Christianos",type:"Wheels",rarity:"Very Rare",series:"Default",obtainable:true,value:50,consoleVal:50},
+{n:"Black Dieci",type:"Wheels",rarity:"Exotic",series:"Trade Up",obtainable:true,value:35000,consoleVal:40000},
+{n:"Titanium White Zomba",type:"Wheels",rarity:"Exotic",series:"CC4",obtainable:true,value:3000,consoleVal:3500},
+{n:"Black Standard",type:"Boosts",rarity:"Import",series:"Trade Up",obtainable:true,value:3500,consoleVal:4000},
+{n:"Titanium White Standard",type:"Boosts",rarity:"Import",series:"Trade Up",obtainable:true,value:1200,consoleVal:1500},
+{n:"Gold Rush (Alpha Boost)",type:"Boosts",rarity:"Limited",series:"Alpha",obtainable:false,value:800000,consoleVal:0},
+{n:"Dueling Dragons",type:"Goal Explosions",rarity:"Black Market",series:"Velocity",obtainable:true,value:2500,consoleVal:3000},
+{n:"Big Splash",type:"Goal Explosions",rarity:"Limited",series:"RLCS",obtainable:false,value:400,consoleVal:500},
+{n:"Hellfire",type:"Goal Explosions",rarity:"Black Market",series:"Overdrive",obtainable:true,value:600,consoleVal:700},
+{n:"Halo",type:"Toppers",rarity:"Uncommon",series:"Default",obtainable:true,value:50,consoleVal:50},
+{n:"Titanium White Halo",type:"Toppers",rarity:"Uncommon",series:"Trade Up",obtainable:true,value:300,consoleVal:350},
+{n:"Mainframe",type:"Decals",rarity:"Black Market",series:"Zephyr",obtainable:true,value:800,consoleVal:900},
+{n:"Dissolver",type:"Decals",rarity:"Black Market",series:"Triumph",obtainable:true,value:1500,consoleVal:1800},
+{n:"Titanium White Mainframe",type:"Decals",rarity:"Black Market",series:"Zephyr",obtainable:true,value:8000,consoleVal:9000},
+{n:"Fire God",type:"Decals",rarity:"Black Market",series:"Impact",obtainable:true,value:500,consoleVal:600},
+{n:"EQ",type:"Trails",rarity:"Limited",series:"RLCS",obtainable:false,value:200,consoleVal:250},
+{n:"Lightspeed",type:"Trails",rarity:"Very Rare",series:"Overdrive",obtainable:true,value:50,consoleVal:50},
+{n:"Motormouth",type:"Engine Audio",rarity:"Premium",series:"DLC",obtainable:false,value:0,consoleVal:0}
+];
+
+var PRESETS=[
+{n:"Clean Fennec (Default)",car:"Fennec",hitbox:"Hybrid",decal:"None",wheels:"Christianos",boost:"Standard",topper:"None"},
+{n:"Pro White Fennec",car:"TW Fennec",hitbox:"Hybrid",decal:"Mainframe",wheels:"Black Dieci",boost:"TW Standard",topper:"None"},
+{n:"Classic Octane",car:"Octane",hitbox:"Octane",decal:"None",wheels:"Christianos",boost:"Standard",topper:"None"},
+{n:"Jstn Setup",car:"Octane",hitbox:"Octane",decal:"Dune Racer",wheels:"Black Dieci",boost:"Black Standard",topper:"None"},
+{n:"Squishy Special",car:"Octane",hitbox:"Octane",decal:"Kilowatt",wheels:"Black Veloce",boost:"Standard",topper:"None"},
+{n:"Dominus Main",car:"Dominus",hitbox:"Dominus",decal:"RLCS",wheels:"Black OEM",boost:"Standard",topper:"None"},
+{n:"Sweaty Tryhard",car:"TW Octane",hitbox:"Octane",decal:"TW Mainframe",wheels:"Black Dieci",boost:"Alpha Boost",topper:"None"},
+{n:"Budget King",car:"Octane",hitbox:"Octane",decal:"None",wheels:"Cristiano",boost:"Standard",topper:"Halo"},
+{n:"Fennec Street",car:"Fennec",hitbox:"Hybrid",decal:"Ombre",wheels:"Black Stern",boost:"Flamethrower",topper:"None"},
+{n:"Breakout Ace",car:"Breakout",hitbox:"Breakout",decal:"Dot Matrix",wheels:"Zomba",boost:"Thermal",topper:"None"},
+{n:"GC Tryhard",car:"Octane",hitbox:"Octane",decal:"Dissolver",wheels:"Black Veloce",boost:"Black Standard",topper:"None"},
+{n:"Clean Minimal",car:"Fennec",hitbox:"Hybrid",decal:"Huntress",wheels:"Cristianos",boost:"Standard Orange",topper:"None"},
+{n:"Toxic Green",car:"Octane",hitbox:"Octane",decal:"Interstellar",wheels:"Emerald",boost:"Helios",topper:"None"},
+{n:"RLCS Pro",car:"Octane",hitbox:"Octane",decal:"RLCS X",wheels:"Metalstar",boost:"Helios",topper:"None"},
+{n:"Batmobile Hero",car:"Batmobile",hitbox:"Plank",decal:"N/A",wheels:"N/A",boost:"N/A",topper:"N/A"}
+];
+
+var HITBOXES={
+Octane:{l:118.01,w:84.2,h:36.16,use:"Most popular, good for all-round play"},
+Dominus:{l:127.93,w:83.28,h:31.30,use:"Great for flicks and powerful shots"},
+Hybrid:{l:127.02,w:82.19,h:34.16,use:"Fennec default - similar to Octane feel"},
+Breakout:{l:131.49,w:80.52,h:30.30,use:"Long and flat, great for dribbling"},
+Plank:{l:128.82,w:84.67,h:29.39,use:"Batmobile - very flat, unique feel"},
+Merc:{l:120.72,w:85.26,h:39.39,use:"Tallest hitbox, niche use"}
+};
+
+var PROS=[
+{n:"Jstn",team:"NRG/Retired",cam:{fov:110,dist:270,height:100,angle:-4,stiff:.40},sens:{s:1.40,as:1.40,dz:.05,dd:.65},binds:"Boost: O, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Squishy",team:"Content Creator",cam:{fov:110,dist:270,height:110,angle:-3,stiff:.45},sens:{s:1.27,as:1.27,dz:.05,dd:.70},binds:"Boost: O, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Musty",team:"Content Creator",cam:{fov:110,dist:270,height:100,angle:-5,stiff:.50},sens:{s:1.50,as:1.50,dz:.05,dd:.65},binds:"Boost: R1, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Fairy Peak",team:"Vitality",cam:{fov:110,dist:260,height:110,angle:-3,stiff:.45},sens:{s:1.30,as:1.30,dz:.10,dd:.75},binds:"Boost: O, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"GarrettG",team:"NRG",cam:{fov:110,dist:280,height:110,angle:-4,stiff:.45},sens:{s:1.20,as:1.20,dz:.10,dd:.65},binds:"Boost: R1, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Firstkiller",team:"FaZe/G2",cam:{fov:110,dist:270,height:90,angle:-4,stiff:.40},sens:{s:1.80,as:1.80,dz:.05,dd:.60},binds:"Boost: R1, Jump: X, Air Roll L: L1, Air Roll R: R1"},
+{n:"Vatira",team:"Moist/Falcons",cam:{fov:110,dist:270,height:100,angle:-4,stiff:.40},sens:{s:1.40,as:1.40,dz:.05,dd:.70},binds:"Boost: O, Jump: X, Air Roll: Square, Powerslide: L1"},
+{n:"Monkey Moon",team:"BDS",cam:{fov:110,dist:260,height:100,angle:-3,stiff:.50},sens:{s:1.40,as:1.40,dz:.10,dd:.70},binds:"Boost: O, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Kaydop",team:"Vitality",cam:{fov:110,dist:250,height:100,angle:-3,stiff:.50},sens:{s:1.20,as:1.20,dz:.15,dd:.70},binds:"Boost: R1, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Scrub Killa",team:"Retired",cam:{fov:110,dist:270,height:100,angle:-5,stiff:.40},sens:{s:1.20,as:1.20,dz:.10,dd:.65},binds:"Boost: O, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Aztral",team:"Retired",cam:{fov:110,dist:260,height:100,angle:-4,stiff:.35},sens:{s:1.50,as:1.50,dz:.05,dd:.55},binds:"Boost: R1, Jump: X, Air Roll L: Square, Powerslide: L1"},
+{n:"Arsenal",team:"SSG",cam:{fov:110,dist:270,height:100,angle:-3,stiff:.45},sens:{s:1.30,as:1.30,dz:.08,dd:.65},binds:"Boost: R1, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Turbopolsa",team:"Retired",cam:{fov:110,dist:280,height:110,angle:-4,stiff:.40},sens:{s:1.30,as:1.30,dz:.10,dd:.70},binds:"Boost: O, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Lethamyr",team:"Content Creator",cam:{fov:110,dist:260,height:100,angle:-5,stiff:.45},sens:{s:1.40,as:1.40,dz:.10,dd:.65},binds:"Boost: O, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Zen",team:"BDS",cam:{fov:110,dist:270,height:100,angle:-4,stiff:.45},sens:{s:2.00,as:2.00,dz:.05,dd:.55},binds:"Boost: R1, Jump: X, Air Roll L: L1, Air Roll R: Square"},
+{n:"Alpha54",team:"Vitality",cam:{fov:110,dist:270,height:100,angle:-3,stiff:.45},sens:{s:1.30,as:1.30,dz:.08,dd:.70},binds:"Boost: R1, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Comm",team:"G2",cam:{fov:110,dist:280,height:110,angle:-4,stiff:.50},sens:{s:1.40,as:1.40,dz:.05,dd:.65},binds:"Boost: R1, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Chicago",team:"G2/Retired",cam:{fov:110,dist:270,height:100,angle:-4,stiff:.45},sens:{s:1.30,as:1.30,dz:.10,dd:.70},binds:"Boost: R1, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Rizzo",team:"Content Creator",cam:{fov:110,dist:260,height:110,angle:-3,stiff:.50},sens:{s:1.00,as:1.00,dz:.10,dd:.75},binds:"Boost: O, Jump: X, Air Roll: L1, Powerslide: L1"},
+{n:"Joreuz",team:"Dignitas/Karmine",cam:{fov:110,dist:270,height:90,angle:-4,stiff:.40},sens:{s:1.60,as:1.60,dz:.05,dd:.60},binds:"Boost: R1, Jump: X, Air Roll L: L1, Air Roll R: R1"}
+];
+
+var PACKS=[
+{n:"Ultimate Warm Up",code:"FA24-B2B7-2E8E-193B",mech:"General",diff:"Medium",creator:"Poquito"},
+{n:"Shooting Consistency",code:"6EB1-79B6-283B-A3B0",mech:"Shooting",diff:"Medium",creator:"Poquito"},
+{n:"Saves",code:"D5F4-B6A1-B03E-ED53",mech:"Defense",diff:"Medium",creator:"Poquito"},
+{n:"Ground Shots",code:"6CF3-4C0B-4F1E-B030",mech:"Shooting",diff:"Easy",creator:"Poquito"},
+{n:"Aerial Shots",code:"D1E4-E6A0-AFA0-20BE",mech:"Aerial",diff:"Hard",creator:"Poquito"},
+{n:"Wall Shots",code:"5CB2-6D82-1B54-47B1",mech:"Shooting",diff:"Hard",creator:"Poquito"},
+{n:"Backboard Reads",code:"EB4F-FA33-81E7-77B2",mech:"Defense",diff:"Hard",creator:"Kevpert"},
+{n:"Speed Flip Training",code:"A503-264C-A7EB-D282",mech:"Movement",diff:"Hard",creator:"Musty"},
+{n:"Air Dribble Setup",code:"9F6D-4387-4C57-2A4B",mech:"Dribbling",diff:"Hard",creator:"Wayton Pilkin"},
+{n:"Redirects",code:"8D93-C997-0ACD-8416",mech:"Shooting",diff:"Hard",creator:"Kevpert"},
+{n:"Fast Aerial Training",code:"A7F0-11DE-4E7C-AC79",mech:"Aerial",diff:"Medium",creator:"Community"},
+{n:"Half Flip Shots",code:"BAFF-585B-D tried-EFDE",mech:"Movement",diff:"Medium",creator:"Community"},
+{n:"Double Tap Practice",code:"C7E0-D8E8-B6D0-F48F",mech:"Shooting",diff:"Very Hard",creator:"Community"},
+{n:"Shadow Defense Drill",code:"5A65-4073-F310-5495",mech:"Defense",diff:"Medium",creator:"Wayton Pilkin"},
+{n:"Ceiling Shot Practice",code:"E4EF-DCCC-DB85-0A10",mech:"Aerial",diff:"Very Hard",creator:"Community"}
+];
+
+var BINGO_POOLS={
+Bronze:[
+"Teammate drove into own goal","Nobody rotated the entire game","Someone quit after 1 goal","Ball stuck in corner for 30 seconds","Entire team chased the ball","Whiffed a stationary ball","Scored an own goal","Someone said Nice shot on own goal","All 6 players in same corner","Goalie never left the net","Someone drove on the ceiling by accident","Teammate bumped you into the ball","Won despite 0 saves","Ball bounced off 4 cars in a row","Someone typed gg before game ended","Kickoff goal in first 5 seconds","Scored from own half","Everyone missed the aerial","Car flipped upside down for 5 seconds","Someone used all boost driving backward","Match ended 0-0","Accidentally demo'd your teammate","Ball hit crossbar 3 times","Goal scored at 0 seconds","Entire team had 0 saves","Nobody attempted an aerial","Won with only 1 goal","Opponent scored from kickoff","Both teams missed same ball","Someone drove in circles","No goals until overtime","Teammate blocked your shot on open net","Match lasted over 7 minutes","Someone own-goaled twice","Ball spent 20 seconds in the air untouched","Car spawned facing wrong way confusion","Someone said Sorry 5 times","Goalie scored from own goal line","Triple commit on a rolling ball","Opponent accidentally passed to you","Ball rolled along the ground for 10 seconds","Scored while upside down by accident","Someone bumped the goalie out","Won a game without boosting","Teammate made a save off the line","All goals scored in the last minute","Someone disconnected and reconnected","Both teams scored own goals","Goal explosion overlapped the replay","Opponent said close one on a 5-0","Missed the ball on kickoff completely","Scored off the wall by accident"],
+Silver:[
+"Ball chaser took every single touch","Someone typed gg after going down 1-0","Teammate tried an aerial and missed completely","Double commit on a simple clear","Someone spammed What a save sarcastically","Got scored on during goal replay celebration","Opponent did a lucky pinch goal","Whiffed three times in a row","Teammate drove past the ball doing nothing","Someone blamed lag for everything","Won the game in overtime","Half the lobby was AFK at kickoff","Someone side flipped into the wall","Ball bounced perfectly to opponent for a free goal","Got demo'd right before hitting the ball","Someone tried to dribble and lost it instantly","Lucky bounce off three walls then in","Teammate rotated into you","Someone said I got it then whiffed","Scored from a redirect off teammate","Kickoff double commit","Won a 50/50 by accident","Opponent freestyled and missed","Someone said Take the shot then didnt move","Got carried by one teammate","Match ended with 15+ goals total","Teammate bumped you mid-aerial","Ball went in off your own car","Someone ragequit after 2 goals","Saved a shot on your own goal that your teammate caused","Overtime lasted more than 2 minutes","Someone stole your goal and said Nice shot","Hit the post four times in one game","Opponent scored a ceiling shot somehow","Got demoed three times in a game","Someone used the wrong quick chat","Ball stuck on top of goal","Both teams triple committed at once","Someone said defending then chased the ball","Scored a goal from across the field","Opponent was clearly a smurf","Everyone whiffed the same ball twice","Someone said All yours then stole it","Got MVP with 0 goals","Overtime decided by a lucky bounce","Teammate scored while you were typing","Goal scored directly from kickoff","Someone quit and team won anyway","Ball juggled between 3 players","Scored with 0 boost left","Full team rotation actually happened once","Lost to a last-second goal"],
+Gold:[
+"Teammate blamed you for their miss","Went to overtime 3 times in a row","Missed an open net from 5 feet away","Got faked out by a dribble","Someone tried a ceiling shot and whiffed","What a save spam after lucky goal","Teammate cut your rotation perfectly","Double committed on an aerial","Solo queued into a 3-stack","Got bumped off the ball at the worst moment","Speed flip kickoff went wrong","Someone stole your goal and celebrated","Overtime winner off the crossbar","Teammate was AFK for 30 seconds","Lost to a last second equaliser","Whiffed a fast aerial in front of everyone","Opponent flip reset attempted and failed","Ball rolled in at 2 mph","Bumped your own teammate into own goal","Carried the team with 5+ goals","Got demoed while dribbling a perfect play","Toxic player went silent after comeback","Won a game you should have lost","Teammate left and you still won","Someone said Okay 47 times","Saved a shot that was definitely going in","Opponent had a smurf account name","Tried a half flip and front flipped","Aerial redirect went completely wrong direction","Someone spammed Take the shot while you were rotating back","Got scored on from a clear across the map","Won with 800+ points","Opponent forfeit after going down 2 goals","Lucky pinch goal from midfield","Double tap bounced off the post","Someone typed ez after a 1-goal win","Missed the boost pad you were aiming for","Got bumped into your own goal","Opponent passed to teammate for easy tap in","Tried to demo someone and missed","Wall shot went straight up","Your clear went to the opponent perfectly","Someone said Need boost while sitting on full boost","Teammate blocked your shot for the third time","Got scored on at 0:00 in overtime","Won a 1v2 after teammate quit","Ball sat on top of your car and you panicked","Someone said Nice block sarcastically","Opponent scored while you were grabbing corner boost","Your best save was followed by the opponent scoring anyway","Accidentally centered for the opponent","Three post hits in one shot sequence"],
+Platinum:[
+"Someone tried an air dribble and it hit their own net","Teammate went for a ceiling shot in ranked","Got faked by a delayed flick","Double commit on a wall clear","Someone typed ur trash after they were bottom of scoreboard","Lost because teammate went for boost instead of save","Opponent hit a musty flick","Saved a redirect that shouldve been a goal","Someone blamed the server for their whiff","Got dunked on by a fast aerial","Teammate passed to nobody","Ceiling shot pinched off the crossbar","Someone tried a breezi and barrel rolled into the ground","Won a game with 100 point difference between teammates","Got demo spawn camped twice","Opponent air dribbled from their own half","Your clear set up a perfect shot for the opponent","Teammate rage quit after one mistake","Got scored on during your goal replay","Both teams agreed to forfeit then someone scored","Half flip went wrong at the worst time","Overtime goal from a kickoff","Triple fake into a goal","Someone said rotate then triple committed","Got bumped while going for a save","Air roll shot went completely sideways","Opponent scored a double tap","Your team had perfect rotation for exactly one play","Someone said tm8 trash then scored an own goal","Missed a save because of camera angle switch","Ball bounced off 3 players and went in","Got faked by someone doing literally nothing","Perfect pass was wasted by a whiff","Won without either team scoring an aerial","Someone spammed Wow after a demo","Kickoff pinch goal from midfield","Your dribble was ruined by a teammate bump","Opponent scored from 0 second bounce","Wall read went perfectly for once","Got juked by a simple ground play","Someone went AFK right before overtime","Overtime lasted under 5 seconds","Prejump challenge worked perfectly","Ground pinch accidentally went to the right place","Wave dash chain actually gained speed","Your aerial was cut off by a teammate","Lost to a team with matching clan tags","Goal stolen by your teammate from the goal line","Shadow defense actually stopped the play","Boost starved yourself going for a big pad","Fast aerial over the ball completely","Double tap hit the backboard and sat there"],
+Diamond:[
+"Someone did a musty into the side wall","Toxic 3-stack in 2v2","Got dunked on by a flip reset","Teammate ball chased while you set up a pass","Air dribble bump into a goal","Someone scored a triple tap","Got demo'd mid flip reset attempt","Lost to a team doing only ground plays","Opponent chain dashed faster than your boost","Prejump challenge got faked","Your ceiling shot had zero power","Double tap setup was stolen by teammate","Someone said close one on a 4-0","Got redirected on from across the field","Teammate went for a freestyle in a 1-goal game","Overtime lasted over 3 minutes","Both teams had 800+ points","Someone air dribble bumped you into your own net","Got faked three times by the same player","Accidentally passed to the opponent perfectly","Your flip reset had no flip","Someone scored a stall redirect","Ceiling shot was read perfectly by goalie","Got bumped off the wall mid-play","Shot was saved by the crossbar","Teammate demo'd the opponent you were about to score on","Your wave dash went sideways","Someone scored from a backwards aerial","Both goalies were up at the same time","Your pass play actually connected","Opponent scored with a ground pinch","Got dunked by someone who was behind you","Fast aerial peaked at the wrong height","Someone rage quit after a demo","Backboard bounce went straight to opponent","Wall shot double touch worked for once","Someone typed uninstall after a whiff","Got MVP on the losing team","Teammate stole the ball during your dribble","Your fake worked but you faked yourself too","Opponent predicted your every move","Scored a goal you had no right scoring","Both teams whiffed the same aerial twice","Boost pad was stolen right before you got to it","Someone scored a pancake flick","Flick went exactly where you wanted for once","Opponent team had perfect comms","Your recovery was faster than their shot","Ceiling pinch goal from nowhere","Someone gg'd at 3 minutes left","Double commit in diamond somehow","Save of the year followed by own goal"],
+Champion:[
+"Got called a smurf in champion","Someone had 2000 shot speed and missed open net","Teammate went for a solo play in a 3-0 lead","Flip reset into a musty that actually worked","Double tap read perfectly but saved","Air dribble bump demo into goal","Opponent scored a stall flip reset","Lost to mechanical gods with no game sense","Your speed flip was too slow","Wave dash into immediate challenge won possession","Someone chain dashed across the entire field","Ceiling shot double tap combo","Got faked by a no-flip play","Your pass was too fast for your teammate","Opponent team had better recoveries","Someone scored a pancake musty","Got redirected on from a passing play","Your rotation was cut by a ball chaser","Perfect save but no follow up","Got bumped off a flip reset at the last second","Someone scored from a stall","Double commit at champion rank","Outplayed mechanically but won on rotations","Opponent hit a breezi flick goal","Your air roll shot was beautiful but missed","Lost in overtime to a kickoff goal","Teammate had better mechanics but worse positioning","Got demo'd during your best play of the game","Someone typed uninstall in champion","Your ceiling play was read before you left the ceiling","Opponent team forfeit after 1 goal somehow","Perfect passing play for once","Fast aerial was faster than you expected","Someone triple committed in champion","Your fake play actually worked","Speed flip kickoff countered perfectly","Wall play into air dribble into save","Got outplayed by a basic ground shot","Your flip cancel was too late","Both teams had 1000+ points","Someone scored a 130kph pinch","Teammate was actually a freestyler","Ground play beat mechanical player","Your recovery was the best play of the game","Overtime goal from a pass play","Lost to the same 3-stack twice in a row","Someone changed their name mid-game","Got MVP with most saves","Opponent read your double tap setup","Corner boost race decided the game","Your backboard defense was flawless","Flip reset into a pass for the assist"],
+"Grand Champion":[
+"Flip reset into miss that everyone saw","Someone rage quit after going down in overtime","Got dunked on by a ceiling reset musty","Teammate had 1800 MMR and solo queued","Air dribble bump double tap combo","Lost to SSL smurf in GC lobby","Your flip reset was read before you touched the ball","Someone scored a triple flip reset","Got demoed during a flip reset musty","Overtime lasted 5 minutes","Both teams had 1200+ points","Someone breezi flicked from midfield","Got faked by a stall","Your ceiling shot was saved by a fast aerial","Opponent team had perfect passing plays","Someone scored from a hover play","Got redirected on from a team pinch","Your speed was the slowest in the lobby","Perfect defense for 4 minutes then one mistake","Someone typed uninstall in GC","Air dribble lasted across the whole field","Got bumped into a flip reset somehow","Your musty was read perfectly","Double tap went in off three bounces","Someone had 2000+ hours and whiffed kickoff","Lost to a team of mechanical gods","Your wave dash chain was outpaced","Ceiling shot reset into another reset","Someone scored a 140kph pinch","Got outplayed by fundamentals","Recovery into immediate aerial goal","Teammate was freestyling in GC ranked","Ground pinch goal from own half","Your flip reset had too much power","Lost to a smart team not a mechanical team","Someone solo carried their team","Overtime decided by a demo play","Fast aerial contest won by milliseconds","Your backboard read was too early","Team pinch goal from midfield","Opponent predicted your aerial path","Someone scored a pancake stall reset","Your best game ever was a loss","Boost management decided the match","Got bumped into scoring an own goal","Lost to a last second redirect","Someone gg'd in grand champion unironically","Ceiling pinch into a flip reset goal","Your pass play was too ambitious","Perfect rotation got undone by one mistake","Double tap off the backboard post","Someone scored while tornado spinning"],
+SSL:[
+"Flip reset into miss at SSL","Someone actually hit a quintuple reset","Got outplayed by a gold mechanic at SSL level","Ceiling shot musty double tap combo","Air dribble that lasted 8 seconds","Someone scored a stall breezi","Lost to the rank 1 player","Your mechanics were irrelevant vs game sense","Team pinch goal at 150kph","Someone freestyled in SSL ranked and scored","Ground play beat every mechanical attempt","Got demo spawn killed three times","Overtime lasted over 7 minutes","Both teams over 1500 points","Someone chain dashed the entire field in 3 seconds","Flip reset pass to teammate aerial","Ceiling reset musty into backboard double tap","Someone scored while inverted the entire time","Your read was wrong for the first time in 10 games","Got bumped into your own net from midfield","Someone tornado spun for the entire aerial","Lost to a team running only demos","Your prejump was read and faked","Double flip reset goal in ranked","Someone scored from behind their own net","Opponent had 5000 hours and it showed","Your best save became an assist for the opponent","Fast aerial contest at the exact same time","Wall pinch reset into a musty","Got outrotated by a 3-stack","Someone scored a pancake reset breezi","Your ground game was the weakest in the lobby","Boost starved the entire team perfectly","Someone scored with zero boost from midfield","Got redirected on from a team play","Your flip reset was countered by a flip reset","Lost to a content creator","Ceiling play lasted across the whole map","Someone hit a 150kph aerial redirect","Ground to air dribble lasted 6 seconds","Double tap read into a passing play","Your recoveries won the game not your shots","Someone gg uninstalled after 1 goal in SSL","Team demo play cleared all 3 opponents","Wall to ceiling to air dribble goal","Got faked by someone driving in a straight line","Your best aerial was saved by a better one","Opponent breezi musty combo in ranked","Lost despite having 70 percent possession","Someone scored a pogo goal","Both teams had 0 demos the entire match","Speed flip kickoff into immediate aerial"
+]};
+
+
+var DAILY_MECHS=["Practice half flips for 10 minutes","Hit 5 wall shots in training","Land 3 fast aerials in a row","Score a musty flick in free play","Wave dash 10 times without boost","Get 3 saves using shadow defense","Chain 5 speed flip kickoffs","Air dribble from wall 3 times","Score a double tap in training","Practice ground dribbles for 5 mins","Hit 10 powershots on target","Try 3 ceiling shots","Practice recovery after every aerial","Score using a pinch","Try a 45 degree flick 5 times"];
+
+var RANKS=["Bronze","Silver","Gold","Platinum","Diamond","Champion","Grand Champion","SSL"];
+var RANK_COLORS={Bronze:"#cd7f32",Silver:"#c0c0c0",Gold:"#ffd700",Platinum:"#42a5f5",Diamond:"#7c4dff",Champion:"#e040fb","Grand Champion":"#f44336",SSL:"#ffffff"};
+
+var RANK_GUIDE=[
+{rank:"Bronze",focus:["Learn to hit the ball","Basic car control","Don't chase ball constantly"],avoid:["Trying aerials","Ball chasing","Sitting in goal all game"],mechs:["Front Flip","Side Flip","Powershot"]},
+{rank:"Silver",focus:["Basic rotation","Power shots","Simple saves"],avoid:["Over-committing","Double committing with teammate","Ignoring boost pads"],mechs:["Aerial","Power Slide Cut","50/50"]},
+{rank:"Gold",focus:["Consistent aerials","Fast aerials","Rotation awareness","Boost management"],avoid:["Going for every ball","Cutting rotation","Using all boost on one play"],mechs:["Fast Aerial","Speed Flip","Half Flip","Wave Dash","Ground Dribble"]},
+{rank:"Platinum",focus:["Wall play","Backboard defense","Basic flicks","Consistent speed flips"],avoid:["Over-dribbling","Poor challenge timing","Slow recoveries"],mechs:["Wall Shot","Dribble Flick","Backboard Read","Shadow Defense"]},
+{rank:"Diamond",focus:["Air roll control","Passing plays","Advanced saves","Consistent defense"],avoid:["Ball chasing in the air","Slow transitions","Ignoring teammates"],mechs:["Air Roll Shot","Redirect","Ceiling Shot","Double Tap"]},
+{rank:"Champion",focus:["Speed of play","Reading the game","Consistent mechanics","Team play"],avoid:["Solo plays in 3s","Hesitating on challenges","Poor boost pathing"],mechs:["Flip Reset","Musty Flick","Chain Dash","Air Dribble"]},
+{rank:"Grand Champion",focus:["Game sense mastery","Mechanical consistency","Opponent reading","Perfect rotation"],avoid:["Autopilot gameplay","Predictable plays","Tilting"],mechs:["Breezi Flick","Stall","Tornado Spin"]},
+{rank:"SSL",focus:["Perfect everything","Innovation","Mental game","Adaptation"],avoid:["Complacency","Fixed playstyle"],mechs:["Double Flip Reset","Ceiling Reset Musty","All SSL Level mechanics"]}
+];
+
+var TIPS_DB=["Turn off camera shake in settings immediately.","Use ball cam 90% of the time, only turn off for dribbling.","Collect small boost pads instead of always going for full boost.","Rotate back post, never near post on defense.","Don't chase the ball - let it come to you sometimes.","Free play is the best training mode, period.","Watch your replays from opponent perspective to spot mistakes.","Bind air roll to L1/LB for consistency.","Turn off voice chat to avoid tilt.","Play 1v1 to improve fastest, even if you hate it.","Your rank doesn't matter - improvement does.","Take breaks after 3 losses in a row.","Learn to half flip before anything flashy.","Fast aerial is the single most important mechanic for Gold.","Don't try to learn mechanics above your rank."];
+
+var HOROSCOPES=["The ball favors you today. Go for those risky aerials.","Mercury is in boost-grade retrograde. Rotate back post.","Your kickoff energy is unstoppable today.","The stars say play 1v1. Face your fears.","Venus suggests passing plays will lead to victory.","Saturn warns: your teammates will ball chase today. Adapt.","Neptune blesses your saves. Play goalie.","Mars demands demos. Be the chaos.","Your lucky boost pad is the back-left corner.","The cosmos say your flip resets will hit different today."];
+
+var QUIZ_DATA=[
+{q:"What is the Fennec's hitbox type?",opts:["Octane","Hybrid","Dominus","Breakout"],ans:1},
+{q:"Which mechanic gives you an unlimited flip timer?",opts:["Wave Dash","Ceiling Shot","Speed Flip","Half Flip"],ans:1},
+{q:"What speed makes your car supersonic?",opts:["1200 uu/s","1600 uu/s","2200 uu/s","2300 uu/s"],ans:2},
+{q:"Who won the first RLCS World Championship?",opts:["NRG","FlipSid3","iBP Cosmic","G2"],ans:2},
+{q:"How many boost pads are on a standard map?",opts:["28","34","40","44"],ans:1}
+];
+
+// State
+var S={
+activeTab:"mechanics",heroIdx:0,
+vehicles:JSON.parse(JSON.stringify(PRESETS)),
+mechFilter:{cat:"all",status:"all",sort:"diff"},
+mechFavs:{},
+cosmOwned:{},cosmWish:{},
+proCompare:[],
+tracker:{sessions:[],winStreakCur:0,winStreakMax:0,lossCur:0},
+routine:{blocks:[{n:"Ball Control",dur:300,elapsed:0},{n:"Half Flips",dur:180,elapsed:0},{n:"Aerial Control",dur:300,elapsed:0},{n:"Wall Redirects",dur:240,elapsed:0},{n:"Speed Flips & Wave Dashes",dur:300,elapsed:0},{n:"Free Explore",dur:420,elapsed:0}],streak:0,lastDate:null},
+goals:{targetRank:"Platinum",targetDate:"",sessPerWeek:4,mechGoals:[],dailyGoal:""},
+packBookmarks:{},packRatings:{},
+settings:{theme:"dark",accent:"orange",username:"Mffnpffn",rank:"Gold 3",platform:"both",sounds:true,animations:true},
+bingoState:[],tierlist:{S:[],A:[],B:[],C:[],D:[]},
+visitCount:0,sessionStart:null,recentViewed:[]
+};
+
+function load(){try{var d=localStorage.getItem("rlhub");if(d){var p=JSON.parse(d);for(var k in p)if(p.hasOwnProperty(k))S[k]=p[k];}}catch(e){}S.visitCount=(S.visitCount||0)+1;if(!S.sessionStart)S.sessionStart=Date.now();}
+function save(){try{localStorage.setItem("rlhub",JSON.stringify(S));}catch(e){}}
+function toast(m){var t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show");},2200);}
+function fmt(n){if(n>=1e6)return(n/1e6).toFixed(1)+"M";if(n>=1e3)return(n/1e3).toFixed(1)+"k";return String(n);}
+function esc(s){return s?s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"):""}
+function doy(){var n=new Date(),s=new Date(n.getFullYear(),0,0);return Math.floor((n-s)/864e5);}
+
+// Audio
+var aC=null;
+function gA(){if(!aC)try{aC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}return aC;}
+function playBoost(){if(!S.settings.sounds)return;var c=gA();if(!c)return;var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=200;o.type="sawtooth";g.gain.setValueAtTime(.08,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.4);o.start(c.currentTime);o.stop(c.currentTime+.4);}
+function playClick(){if(!S.settings.sounds)return;var c=gA();if(!c)return;var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=900;o.type="square";g.gain.setValueAtTime(.04,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.06);o.start(c.currentTime);o.stop(c.currentTime+.06);}
+function playGoal(){if(!S.settings.sounds)return;var c=gA();if(!c)return;[523,659,784].forEach(function(f,i){var o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=f;o.type="sine";g.gain.setValueAtTime(.08,c.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+i*.12+.25);o.start(c.currentTime+i*.12);o.stop(c.currentTime+i*.12+.25);});}
+
+// Confetti
+function fireConfetti(){var cv=document.createElement("canvas");cv.className="confetti-canvas";cv.width=window.innerWidth;cv.height=window.innerHeight;document.body.appendChild(cv);var ctx=cv.getContext("2d");var ps=[];for(var i=0;i<60;i++)ps.push({x:cv.width/2,y:cv.height/2,vx:(Math.random()-.5)*12,vy:Math.random()*-10-4,s:Math.random()*6+3,c:["#ff8c00","#1e90ff","#4caf50","#ff4444","#ffd700"][Math.floor(Math.random()*5)],g:.15});
+var frames=0;function anim(){ctx.clearRect(0,0,cv.width,cv.height);for(var i=0;i<ps.length;i++){var p=ps[i];p.x+=p.vx;p.y+=p.vy;p.vy+=p.g;ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.s,p.s);}frames++;if(frames<80)requestAnimationFrame(anim);else document.body.removeChild(cv);}anim();}
+
+// Particles
+function initP(){var c=document.getElementById("pC");if(!c)return;var ctx=c.getContext("2d");var ps=[];
+function r(){c.width=window.innerWidth;c.height=window.innerHeight;}r();window.addEventListener("resize",r);
+for(var i=0;i<20;i++)ps.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-.5)*.3,vy:Math.random()*-.3-.1,s:Math.random()*2+1,a:Math.random()*.3+.05,c:Math.random()>.5?"rgba(255,140,0,":"rgba(30,144,255,"});
+function anim(){ctx.clearRect(0,0,c.width,c.height);for(var i=0;i<ps.length;i++){var p=ps[i];p.x+=p.vx;p.y+=p.vy;if(p.y<0){p.y=c.height;p.x=Math.random()*c.width;}if(p.x<0)p.x=c.width;if(p.x>c.width)p.x=0;ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,Math.PI*2);ctx.fillStyle=p.c+p.a+")";ctx.fill();}requestAnimationFrame(anim);}anim();}
+
+// Hero
+var hI=null;
+function rHero(){var h=document.getElementById("hero");if(!PRESETS.length)return;
+var o='';for(var i=0;i<Math.min(PRESETS.length,8);i++){var p=PRESETS[i];
+o+='<div class="hero-slide'+(i===S.heroIdx?' active':'')+'" onclick="R.heroTap('+i+')"><div class="hero-bg" style="background:linear-gradient(135deg,var(--bg3),var(--bg4))"></div><div class="hero-ov"></div>';
+o+='<span class="hero-badge">'+p.hitbox+'</span>';
+o+='<div class="hero-ct"><div class="hero-name">'+p.n+'</div><div style="font-size:.68rem;color:var(--text2)">'+p.car+' | '+p.wheels+' | '+p.boost+'</div></div></div>';}
+o+='<div class="hero-arrows"><div class="hero-arrow" onclick="R.heroPrev()">&#9664;</div><div class="hero-arrow" onclick="R.heroNext()">&#9654;</div></div>';
+o+='<div class="hero-dots">';for(var d=0;d<Math.min(PRESETS.length,8);d++)o+='<div class="hero-dot'+(d===S.heroIdx?' active':'')+'" onclick="R.heroGo('+d+')"></div>';o+='</div>';
+var mastered=0;for(var m=0;m<MECHS.length;m++)if(MECHS[m].status==="mastered")mastered++;
+var pct=Math.round(mastered/MECHS.length*100);
+o+='<div class="stats-bar"><div class="stat-i"><span class="stat-v" style="color:#ffd700">Gold 3</span></div>';
+o+='<div class="stat-i">Mastery <span class="stat-v">'+pct+'%</span></div>';
+o+='<div class="stat-i">Sessions <span class="stat-v">'+(S.tracker.sessions.length||0)+'</span></div>';
+o+='<div class="stat-i">Streak <span class="stat-v">'+(S.tracker.winStreakCur||0)+'W</span></div></div>';
+h.innerHTML=o;if(hI)clearInterval(hI);hI=setInterval(function(){S.heroIdx=(S.heroIdx+1)%Math.min(PRESETS.length,8);updH();},5000);}
+function updH(){var sl=document.querySelectorAll(".hero-slide"),dt=document.querySelectorAll(".hero-dot");for(var i=0;i<sl.length;i++)sl[i].classList.toggle("active",i===S.heroIdx);for(var d=0;d<dt.length;d++)dt[d].classList.toggle("active",d===S.heroIdx);}
+function heroTap(i){switchTab("garage");}
+
+function rTabs(){var tb=document.getElementById("tabBar"),o='';for(var i=0;i<TABS.length;i++)o+='<button class="tab-btn'+(S.activeTab===TABS[i].id?' active':'')+'" data-tab="'+TABS[i].id+'">'+TABS[i].l+'</button>';tb.innerHTML=o;
+var bs=tb.querySelectorAll(".tab-btn");for(var b=0;b<bs.length;b++)bs[b].addEventListener("click",function(){switchTab(this.getAttribute("data-tab"));});}
+function switchTab(id){S.activeTab=id;playClick();var bs=document.querySelectorAll(".tab-btn"),ts=document.querySelectorAll(".tc");for(var i=0;i<bs.length;i++)bs[i].classList.toggle("active",bs[i].getAttribute("data-tab")===id);for(var j=0;j<ts.length;j++)ts[j].classList.toggle("active",ts[j].id==="tc-"+id);renderTab(id);var a=document.querySelector(".tab-btn.active");if(a)a.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});}
+function renderTab(id){switch(id){case"mechanics":rMech();break;case"cosmetics":rCosm();break;case"garage":rGar();break;case"pros":rPros();break;case"tracker":rTrack();break;case"routine":rRoutine();break;case"goals":rGoals();break;case"packs":rPacks();break;case"rankguide":rRank();break;case"fun":rFun();break;case"settings":rSet();break;}}
+
+// ===== MECHANICS =====
+function rMech(){var el=document.getElementById("tc-mechanics"),o='';
+var di=doy()%DAILY_MECHS.length;
+o+='<div class="econ-card" style="border-left:3px solid var(--accent)"><div class="econ-lbl">Daily Challenge</div><div style="font-size:.82rem;font-weight:600">'+DAILY_MECHS[di]+'</div></div>';
+o+='<div class="fb"><button class="fbtn'+(S.mechFilter.cat==="all"?" active":"")+'" onclick="R.mfC(\'all\')">All</button>';
+var cats=["Movement","Aerial","Shooting","Defense","Flicks","Dribbling","Resets","Advanced","SSL Level"];
+for(var c=0;c<cats.length;c++)o+='<button class="fbtn'+(S.mechFilter.cat===cats[c]?" active":"")+'" onclick="R.mfC(\''+cats[c]+'\')">'+cats[c]+'</button>';
+o+='</div><div class="fb">';
+o+='<button class="fbtn'+(S.mechFilter.status==="all"?" active":"")+'" onclick="R.mfS(\'all\')">All</button>';
+o+='<button class="fbtn'+(S.mechFilter.status==="mastered"?" active":"")+'" onclick="R.mfS(\'mastered\')">Mastered</button>';
+o+='<button class="fbtn'+(S.mechFilter.status==="learning"?" active":"")+'" onclick="R.mfS(\'learning\')">Learning</button>';
+o+='<button class="fbtn'+(S.mechFilter.status==="next"?" active":"")+'" onclick="R.mfS(\'next\')">Up Next</button>';
+o+='<button class="fbtn'+(S.mechFilter.status==="later"?" active":"")+'" onclick="R.mfS(\'later\')">Later</button></div>';
+var fl=MECHS.filter(function(m){if(S.mechFilter.cat!=="all"&&m.cat!==S.mechFilter.cat)return false;if(S.mechFilter.status!=="all"&&m.status!==S.mechFilter.status)return false;return true;});
+fl.sort(function(a,b){return a.diff-b.diff;});
+for(var i=0;i<fl.length;i++){var m=fl[i];var dc=m.diff<=3?"var(--green)":m.diff<=6?"var(--accent)":m.diff<=8?"var(--red)":"#9c27b0";
+o+='<div class="mech-card" id="mc-'+i+'">';
+o+='<div class="mech-h" onclick="this.parentElement.classList.toggle(\'open\')">';
+o+='<div class="mech-diff" style="background:'+dc+';color:#000">'+m.diff+'</div>';
+o+='<div><div class="mech-name">'+m.n+'</div><div class="mech-cat">'+m.cat+'</div></div>';
+o+='<span class="mech-status '+m.status+'">'+m.status.charAt(0).toUpperCase()+m.status.slice(1)+'</span>';
+o+='</div><div class="mech-body">';
+o+='<div class="mech-desc">'+m.desc+'</div>';
+for(var s=0;s<m.steps.length;s++)o+='<div class="mech-step">'+(s+1)+'. '+m.steps[s]+'</div>';
+if(m.tip)o+='<div class="mech-tip">&#128161; '+m.tip+'</div>';
+o+='<div class="mech-links">';
+var statuses=["mastered","learning","next","later"];
+for(var st=0;st<statuses.length;st++){var sn=statuses[st];o+='<button class="btn btn-s'+(m.status===sn?'':' btn-o')+'" onclick="R.setMS('+MECHS.indexOf(m)+',\''+sn+'\')">'+sn.charAt(0).toUpperCase()+sn.slice(1)+'</button>';}
+if(m.pack)o+='<button class="btn btn-s btn-o" onclick="R.copyCode(\''+m.pack+'\')">&#128203; '+m.pack+'</button>';
+o+='<button class="btn btn-s btn-o" onclick="window.open(\'https://www.youtube.com/results?search_query=rocket+league+'+encodeURIComponent(m.n)+'+tutorial\')">&#127909; YouTube</button>';
+o+='</div></div></div>';}
+el.innerHTML=o;}
+function mfC(c){S.mechFilter.cat=c;rMech();}
+function mfS(s){S.mechFilter.status=s;rMech();}
+function setMS(i,s){var old=MECHS[i].status;MECHS[i].status=s;save();rMech();rHero();if(s==="mastered"&&old!=="mastered"){fireConfetti();playGoal();toast("Mastered "+MECHS[i].n+"!");}else{toast(MECHS[i].n+": "+s);}}
+function copyCode(c){try{navigator.clipboard.writeText(c);}catch(e){}toast("Copied: "+c);}
+
+// ===== COSMETICS =====
+function rCosm(){var el=document.getElementById("tc-cosmetics"),o='';
+o+='<div class="stitle">&#127912; Cosmetics Database</div>';
+var types=["Car Bodies","Decals","Wheels","Boosts","Goal Explosions","Toppers","Trails","Engine Audio"];
+o+='<div class="fb">';for(var t=0;t<types.length;t++)o+='<button class="fbtn" onclick="R.cosmF(\''+types[t]+'\',this)">'+types[t]+'</button>';o+='</div>';
+var totalVal=0,owned=0;
+for(var i=0;i<COSMETICS_DB.length;i++){var c=COSMETICS_DB[i];var isOwned=S.cosmOwned[c.n];var isWish=S.cosmWish[c.n];if(isOwned)totalVal+=c.value;if(isOwned)owned++;
+o+='<div class="cosm-card"><div class="cosm-img">'+c.type.charAt(0)+'</div><div class="cosm-info"><div class="cosm-name">'+c.n+'</div>';
+o+='<div class="cosm-meta">'+c.rarity+' | '+c.series+(c.obtainable?'':' | <span style="color:var(--red)">Legacy</span>')+'</div>';
+if(c.value>0)o+='<div class="cosm-val">PC: '+fmt(c.value)+'c'+(c.consoleVal!==c.value?' | Console: '+fmt(c.consoleVal)+'c':'')+'</div>';
+o+='</div><div class="cosm-acts">';
+o+='<span style="cursor:pointer;font-size:.75rem;opacity:'+(isOwned?'1':'.3')+'" onclick="R.togOwn(\''+esc(c.n)+'\')">'+(isOwned?"\u2705":"\u2b1c")+'</span>';
+o+='<span style="cursor:pointer;font-size:.75rem;opacity:'+(isWish?'1':'.3')+';margin-left:2px" onclick="R.togWish(\''+esc(c.n)+'\')">'+(isWish?"\u2b50":"\u2606")+'</span>';
+o+='</div></div>';}
+o+='<div class="econ-card"><div class="econ-lbl">Collection Summary</div><div style="display:flex;gap:12px"><div><div class="econ-val">'+owned+'</div><div class="econ-lbl">Owned</div></div><div><div class="econ-val">'+fmt(totalVal)+'c</div><div class="econ-lbl">Total Value</div></div></div></div>';
+el.innerHTML=o;}
+function togOwn(n){S.cosmOwned[n]=!S.cosmOwned[n];save();rCosm();toast(S.cosmOwned[n]?"Owned":"Removed");}
+function togWish(n){S.cosmWish[n]=!S.cosmWish[n];save();rCosm();toast(S.cosmWish[n]?"Wishlisted":"Removed");}
+function cosmF(type,btn){var bs=btn.parentElement.querySelectorAll(".fbtn");for(var i=0;i<bs.length;i++)bs[i].classList.remove("active");btn.classList.add("active");}
+
+// ===== GARAGE =====
+function rGar(){var el=document.getElementById("tc-garage"),o='';
+o+='<div class="stitle">&#128663; Garage</div>';
+o+='<div class="fb"><button class="fbtn active">All</button><button class="fbtn" onclick="">Octane</button><button class="fbtn">Hybrid</button><button class="fbtn">Dominus</button><button class="fbtn">Breakout</button><button class="fbtn">Plank</button></div>';
+for(var i=0;i<PRESETS.length;i++){var p=PRESETS[i];
+o+='<div class="card"><div class="card-h" onclick="this.parentElement.classList.toggle(\'open\')"><div style="flex:1"><div style="font-family:Rajdhani,sans-serif;font-weight:700;font-size:.88rem">'+p.n+'</div><div style="font-size:.62rem;color:var(--text3)">'+p.car+' | '+p.hitbox+' Hitbox</div></div><span class="rank-badge" style="background:var(--accent);color:#000;font-size:.58rem">'+p.hitbox+'</span></div>';
+o+='<div class="card-body"><div class="pro-grid">';
+o+='<div class="pro-stat">Car: <b>'+p.car+'</b></div>';
+o+='<div class="pro-stat">Decal: <b>'+p.decal+'</b></div>';
+o+='<div class="pro-stat">Wheels: <b>'+p.wheels+'</b></div>';
+o+='<div class="pro-stat">Boost: <b>'+p.boost+'</b></div>';
+o+='<div class="pro-stat">Topper: <b>'+p.topper+'</b></div>';
+o+='<div class="pro-stat">Hitbox: <b>'+p.hitbox+'</b></div>';
+o+='</div></div></div>';}
+o+='<div class="stitle" style="margin-top:10px">&#128207; Hitbox Comparison</div>';
+var hbs=Object.keys(HITBOXES);
+for(var h=0;h<hbs.length;h++){var hb=HITBOXES[hbs[h]];
+o+='<div class="econ-card" style="padding:7px 10px"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:.82rem">'+hbs[h]+'</b><span style="font-size:.62rem;color:var(--text3)">'+hb.l+' x '+hb.w+' x '+hb.h+'</span></div><div style="font-size:.65rem;color:var(--text2);margin-top:2px">'+hb.use+'</div></div>';}
+el.innerHTML=o;}
+
+// ===== PRO SETTINGS =====
+function rPros(){var el=document.getElementById("tc-pros"),o='';
+o+='<div class="stitle">&#127918; Pro Settings</div>';
+o+='<div style="font-size:.65rem;color:var(--amber);padding:4px 6px;background:rgba(255,152,0,.06);border-radius:var(--radius-sm);margin-bottom:8px">&#9888; Settings may have changed since last update. PS5 button layout shown.</div>';
+for(var i=0;i<PROS.length;i++){var p=PROS[i];
+o+='<div class="pro-card"><div style="display:flex;justify-content:space-between;align-items:center"><div><div class="pro-name">'+p.n+'</div><div class="pro-team">'+p.team+'</div></div></div>';
+o+='<div class="pro-grid" style="margin-top:5px">';
+o+='<div class="pro-stat">FOV: <b>'+p.cam.fov+'</b></div>';
+o+='<div class="pro-stat">Distance: <b>'+p.cam.dist+'</b></div>';
+o+='<div class="pro-stat">Height: <b>'+p.cam.height+'</b></div>';
+o+='<div class="pro-stat">Angle: <b>'+p.cam.angle+'</b></div>';
+o+='<div class="pro-stat">Stiffness: <b>'+p.cam.stiff+'</b></div>';
+o+='<div class="pro-stat">Sens: <b>'+p.sens.s+'</b></div>';
+o+='<div class="pro-stat">Aerial: <b>'+p.sens.as+'</b></div>';
+o+='<div class="pro-stat">Deadzone: <b>'+p.sens.dz+'</b></div>';
+o+='</div><div style="font-size:.62rem;color:var(--text3);margin-top:4px">'+p.binds+'</div></div>';}
+el.innerHTML=o;}
+
+// ===== TRACKER =====
+function rTrack(){var el=document.getElementById("tc-tracker"),o='';
+o+='<div class="stitle">&#128202; Session Tracker</div>';
+if(S.tracker.lossCur>=3)o+='<div class="tilt-warn"><div style="font-family:Rajdhani,sans-serif;font-weight:700;color:var(--red)">&#9888; TILT DETECTED</div><div style="font-size:.75rem;margin-top:3px">'+S.tracker.lossCur+' losses in a row. Take a break!</div><button class="btn btn-s" style="margin-top:4px" onclick="S.tracker.lossCur=0;save();rTrack();">Reset</button></div>';
+o+='<div style="display:flex;gap:5px;margin-bottom:8px">';
+o+='<div class="econ-card" style="flex:1;text-align:center"><div class="econ-lbl">Sessions</div><div class="econ-val">'+(S.tracker.sessions.length||0)+'</div></div>';
+o+='<div class="econ-card" style="flex:1;text-align:center"><div class="econ-lbl">Win Rate</div><div class="econ-val">'+winRate()+'%</div></div>';
+o+='<div class="econ-card" style="flex:1;text-align:center"><div class="econ-lbl">Best Streak</div><div class="econ-val">'+(S.tracker.winStreakMax||0)+'W</div></div></div>';
+o+='<div class="econ-card"><div class="econ-lbl">Log Session</div><div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px">';
+o+='<select class="fsel" id="trMode"><option>Ranked 2v2</option><option>Ranked 3v3</option><option>Ranked 1v1</option><option>Casual</option><option>Free Play</option></select>';
+o+='<input class="sinput" id="trW" type="number" placeholder="Wins" style="width:50px">';
+o+='<input class="sinput" id="trL" type="number" placeholder="Losses" style="width:50px">';
+o+='<button class="btn btn-s" onclick="R.logSess()">Log</button></div>';
+o+='<div style="margin-top:4px"><input class="sinput" id="trNotes" placeholder="Notes..." style="width:100%"></div></div>';
+// Heatmap
+o+='<div class="stitle" style="margin-top:8px">&#128197; Activity Heatmap</div>';
+o+='<div class="heatmap">';
+for(var d=0;d<28;d++){var date=new Date();date.setDate(date.getDate()-27+d);var ds=date.toDateString();var count=0;
+for(var s=0;s<S.tracker.sessions.length;s++){if(new Date(S.tracker.sessions[s].date).toDateString()===ds)count++;}
+var op=count===0?'.1':count===1?'.3':count===2?'.6':'1';
+o+='<div class="heat-cell" style="background:rgba(255,140,0,'+op+')"></div>';}
+o+='</div>';
+if(S.tracker.sessions.length){o+='<div class="stitle" style="margin-top:8px">Recent Sessions</div>';
+var recent=S.tracker.sessions.slice(-8).reverse();
+for(var r=0;r<recent.length;r++){var sess=recent[r];o+='<div class="session-entry"><span style="color:var(--text3);width:55px;flex-shrink:0">'+new Date(sess.date).toLocaleDateString()+'</span><span>'+sess.mode+'</span><span style="color:var(--green)">W:'+sess.wins+'</span><span style="color:var(--red)">L:'+sess.losses+'</span></div>';}}
+el.innerHTML=o;}
+function winRate(){var w=0,t=0;for(var i=0;i<S.tracker.sessions.length;i++){w+=S.tracker.sessions[i].wins||0;t+=(S.tracker.sessions[i].wins||0)+(S.tracker.sessions[i].losses||0);}return t?Math.round(w/t*100):0;}
+function logSess(){var w=parseInt(document.getElementById("trW").value)||0;var l=parseInt(document.getElementById("trL").value)||0;var mode=document.getElementById("trMode").value;var notes=document.getElementById("trNotes").value;
+S.tracker.sessions.push({date:Date.now(),mode:mode,wins:w,losses:l,notes:notes});
+if(w>l){S.tracker.winStreakCur=(S.tracker.winStreakCur||0)+w;S.tracker.lossCur=0;if(S.tracker.winStreakCur>S.tracker.winStreakMax)S.tracker.winStreakMax=S.tracker.winStreakCur;}
+if(l>w){S.tracker.lossCur=(S.tracker.lossCur||0)+l;S.tracker.winStreakCur=0;}
+save();rTrack();rHero();toast("Session logged");}
+
+// ===== ROUTINE =====
+var timers={};
+function rRoutine(){var el=document.getElementById("tc-routine"),o='';
+o+='<div class="stitle">&#9201; Training Routine (45 min)</div>';
+o+='<div class="econ-card"><div class="econ-lbl">Completion Streak</div><div class="econ-val">'+(S.routine.streak||0)+' days</div></div>';
+var total=0,done=0;
+for(var i=0;i<S.routine.blocks.length;i++){var b=S.routine.blocks[i];total+=b.dur;
+var rem=Math.max(0,b.dur-(b.elapsed||0));if(rem===0)done+=b.dur;
+var mins=Math.floor(rem/60),secs=rem%60;
+o+='<div class="timer-block"><div class="timer-name">'+b.n+'</div>';
+o+='<div class="timer-time" id="timer-'+i+'">'+mins+':'+(secs<10?'0':'')+secs+'</div>';
+o+='<div style="font-size:.62rem;color:var(--text3)">'+Math.floor(b.dur/60)+' min block</div>';
+o+='<div class="timer-btns">';
+o+='<button class="btn btn-s" onclick="R.startTimer('+i+')">Start</button>';
+o+='<button class="btn btn-s btn-o" onclick="R.pauseTimer('+i+')">Pause</button>';
+o+='<button class="btn btn-s btn-o" onclick="R.resetTimer('+i+')">Reset</button></div></div>';}
+var pct=total?Math.round(done/total*100):0;
+o+='<div class="goal-bar-bg" style="margin-top:6px"><div class="goal-fill" style="width:'+pct+'%"></div></div>';
+o+='<div style="font-size:.65rem;color:var(--text3);margin-top:3px;text-align:center">'+pct+'% complete</div>';
+o+='<div class="stitle" style="margin-top:10px">&#128075; Warm Up Guide</div>';
+o+='<div class="econ-card" style="font-size:.72rem;color:var(--text2);line-height:1.5">1. Stretch fingers and wrists for 30 seconds<br>2. Free play: hit ball around for 2 minutes<br>3. Practice 10 fast aerials<br>4. Do 5 speed flip kickoffs<br>5. Ready to queue!</div>';
+el.innerHTML=o;}
+function startTimer(i){if(timers[i])return;timers[i]=setInterval(function(){var b=S.routine.blocks[i];b.elapsed=(b.elapsed||0)+1;var rem=Math.max(0,b.dur-b.elapsed);var el=document.getElementById("timer-"+i);if(el)el.textContent=Math.floor(rem/60)+":"+(rem%60<10?"0":"")+(rem%60);if(rem<=0){clearInterval(timers[i]);timers[i]=null;playGoal();toast(b.n+" complete!");}save();},1000);}
+function pauseTimer(i){if(timers[i]){clearInterval(timers[i]);timers[i]=null;toast("Paused");}}
+function resetTimer(i){if(timers[i]){clearInterval(timers[i]);timers[i]=null;}S.routine.blocks[i].elapsed=0;save();rRoutine();}
+
+// ===== GOALS =====
+function rGoals(){var el=document.getElementById("tc-goals"),o='';
+o+='<div class="stitle">&#127919; Goals</div>';
+o+='<div class="goal-card"><div class="econ-lbl">Target Rank</div>';
+o+='<select class="fsel" onchange="S.goals.targetRank=this.value;save();rGoals();">';
+for(var r=0;r<RANKS.length;r++)o+='<option'+(S.goals.targetRank===RANKS[r]?' selected':'')+'>'+RANKS[r]+'</option>';
+o+='</select>';
+o+='<div style="margin-top:6px;display:flex;gap:6px;align-items:center"><span style="font-size:.72rem;color:var(--text2)">Sessions/week:</span><input class="sinput" type="number" value="'+S.goals.sessPerWeek+'" onchange="S.goals.sessPerWeek=parseInt(this.value)||1;save();rGoals();" style="width:50px"></div>';
+var curIdx=RANKS.indexOf("Gold"),targetIdx=RANKS.indexOf(S.goals.targetRank);
+var ranksToClimb=Math.max(0,targetIdx-curIdx);
+var estSessions=ranksToClimb*25;
+o+='<div style="font-size:.72rem;color:var(--text2);margin-top:4px">Estimated sessions needed: ~'+estSessions+'</div>';
+o+='<div style="font-size:.72rem;color:var(--text2)">At '+S.goals.sessPerWeek+'/week: ~'+Math.ceil(estSessions/S.goals.sessPerWeek)+' weeks</div>';
+var gPct=S.tracker.sessions.length>0?Math.min(100,Math.round(S.tracker.sessions.length/Math.max(1,estSessions)*100)):0;
+o+='<div class="goal-bar-bg" style="margin-top:6px"><div class="goal-fill" style="width:'+gPct+'%"></div></div></div>';
+o+='<div class="stitle" style="margin-top:8px">&#128221; Weekly Mechanic Goals</div>';
+o+='<div class="goal-card"><div style="font-size:.72rem;color:var(--text2);margin-bottom:4px">This week focus on:</div>';
+var learning=MECHS.filter(function(m){return m.status==="learning";});
+for(var l=0;l<learning.length;l++)o+='<div style="font-size:.78rem;padding:3px 0">&#128308; '+learning[l].n+' (difficulty '+learning[l].diff+')</div>';
+if(!learning.length)o+='<div style="font-size:.75rem;color:var(--text3)">No mechanics set to learning.</div>';
+o+='</div>';
+o+='<div class="stitle" style="margin-top:8px">&#127775; Daily Goal</div>';
+o+='<div class="goal-card"><input class="sinput" placeholder="Today\'s goal..." style="width:100%" value="'+esc(S.goals.dailyGoal||"")+'" onchange="S.goals.dailyGoal=this.value;save();toast(\'Goal saved\');"></div>';
+el.innerHTML=o;}
+
+// ===== PACKS =====
+function rPacks(){var el=document.getElementById("tc-packs"),o='';
+o+='<div class="stitle">&#128218; Training Packs</div>';
+o+='<div class="fb"><button class="fbtn active">All</button><button class="fbtn">Shooting</button><button class="fbtn">Aerial</button><button class="fbtn">Defense</button><button class="fbtn">Dribbling</button><button class="fbtn">Movement</button></div>';
+var bookmarked=PACKS.filter(function(p){return S.packBookmarks[p.code];});
+if(bookmarked.length){o+='<div class="stitle" style="font-size:.82rem">&#128278; Bookmarked</div>';
+for(var b=0;b<bookmarked.length;b++)o+=packCard(bookmarked[b]);}
+o+='<div class="stitle" style="margin-top:6px">All Packs</div>';
+for(var i=0;i<PACKS.length;i++)o+=packCard(PACKS[i]);
+el.innerHTML=o;}
+function packCard(p){var bk=S.packBookmarks[p.code];
+var o='<div class="pack-card"><div style="flex:1;min-width:0"><div style="font-size:.82rem;font-weight:600">'+p.n+'</div><div style="font-size:.6rem;color:var(--text3)">'+p.mech+' | '+p.diff+' | by '+p.creator+'</div></div>';
+o+='<div class="pack-code" onclick="R.copyCode(\''+p.code+'\')">'+p.code+'</div>';
+o+='<span style="cursor:pointer;font-size:.8rem;opacity:'+(bk?'1':'.3')+'" onclick="R.togBk(\''+p.code+'\')">'+(bk?"\u2605":"\u2606")+'</span></div>';
+return o;}
+function togBk(c){S.packBookmarks[c]=!S.packBookmarks[c];save();rPacks();toast(S.packBookmarks[c]?"Bookmarked":"Removed");}
+
+// ===== RANK GUIDE =====
+function rRank(){var el=document.getElementById("tc-rankguide"),o='';
+o+='<div class="stitle">&#128214; Rank Guide</div>';
+for(var i=0;i<RANK_GUIDE.length;i++){var r=RANK_GUIDE[i];var rc=RANK_COLORS[r.rank]||"var(--accent)";
+o+='<div class="card"><div class="card-h" onclick="this.parentElement.classList.toggle(\'open\')" style="border-left:3px solid '+rc+'">';
+o+='<span class="rank-badge" style="background:'+rc+';color:#000">'+r.rank+'</span>';
+o+='<span style="flex:1;font-size:.85rem;font-weight:600">'+r.rank+'</span></div>';
+o+='<div class="card-body">';
+o+='<div style="font-size:.72rem;font-weight:600;color:var(--green);margin-bottom:3px">Focus On:</div>';
+for(var f=0;f<r.focus.length;f++)o+='<div style="font-size:.7rem;padding:2px 0">&#9989; '+r.focus[f]+'</div>';
+o+='<div style="font-size:.72rem;font-weight:600;color:var(--red);margin-top:4px;margin-bottom:3px">Avoid:</div>';
+for(var a=0;a<r.avoid.length;a++)o+='<div style="font-size:.7rem;padding:2px 0">&#10060; '+r.avoid[a]+'</div>';
+o+='<div style="font-size:.72rem;font-weight:600;color:var(--accent);margin-top:4px;margin-bottom:3px">Key Mechanics:</div>';
+for(var m=0;m<r.mechs.length;m++)o+='<span class="fbtn" style="display:inline-block;margin:1px">'+r.mechs[m]+'</span>';
+o+='</div></div>';}
+o+='<div class="stitle" style="margin-top:10px">&#128260; Rotation Guide</div>';
+o+='<div class="econ-card" style="font-size:.72rem;color:var(--text2);line-height:1.5">&#8226; Always rotate back post (far post)<br>&#8226; Never cut your teammate<br>&#8226; If your teammate is closer to ball, rotate back<br>&#8226; Grab small boost pads while rotating<br>&#8226; 2v2: One attacks, one defends. Simple.<br>&#8226; 3v3: Attacker, Second man, Third man. Rotate positions.</div>';
+o+='<div class="stitle" style="margin-top:8px">&#9981; Boost Management</div>';
+o+='<div class="econ-card" style="font-size:.72rem;color:var(--text2);line-height:1.5">&#8226; You rarely need 100 boost. 30-40 is enough for most plays.<br>&#8226; Collect small pads (12 each) while rotating.<br>&#8226; Don\'t leave net empty to grab corner boost.<br>&#8226; Starve opponents by taking their boost when safe.</div>';
+el.innerHTML=o;}
+
+// ===== FUN =====
+function rFun(){var el=document.getElementById("tc-fun"),o='';
+o+='<div class="stitle">&#127918; Fun Zone</div>';
+o+='<div class="fun-card"><div class="fun-title">&#127920; Random Mechanic Picker</div>';
+o+='<div class="slot-machine"><div class="slot-reel" id="sl1">?</div><div class="slot-reel" id="sl2">?</div><div class="slot-reel" id="sl3">?</div></div>';
+o+='<button class="btn" onclick="R.spin()">SPIN!</button></div>';
+var di=doy()%DAILY_MECHS.length;
+o+='<div class="fun-card"><div class="fun-title">&#127919; Daily Challenge</div><div style="font-size:.8rem;padding:6px;background:var(--bg3);border-radius:var(--radius-sm);border-left:3px solid var(--accent)">'+DAILY_MECHS[di]+'</div></div>';
+// Bingo
+var bingoCard=getDailyBingo();
+var bingoRank=getBingoRank();
+o+='<div class="fun-card"><div class="fun-title">&#127183; '+bingoRank+' Bingo</div>';
+o+='<div class="fb" style="justify-content:center">';
+var bRanks=["Bronze","Silver","Gold","Platinum","Diamond","Champion","Grand Champion","SSL"];
+for(var br=0;br<bRanks.length;br++)o+='<button class="fbtn'+(S.bingoRank===bRanks[br]?" active":"")+'" onclick="R.setBR(\''+bRanks[br]+'\')">'+bRanks[br]+'</button>';
+o+='</div><div class="bingo-grid">';
+for(var b=0;b<25;b++)o+='<div class="bingo-cell'+(S.bingoState[b]?" marked":"")+'" onclick="R.togB('+b+')">'+(b===12?"FREE SPACE":bingoCard[b])+'</div>';
+o+='</div><div style="font-size:.55rem;color:var(--text3);margin-top:3px">Resets daily at midnight. Card seeded by date.</div></div>';
+// Trivia
+var qi=doy()%QUIZ_DATA.length;var q=QUIZ_DATA[qi];
+o+='<div class="fun-card"><div class="fun-title">&#129504; RL Trivia</div><div style="font-size:.8rem;margin-bottom:6px">'+q.q+'</div>';
+for(var i2=0;i2<q.opts.length;i2++)o+='<button class="btn btn-s btn-o" style="margin:2px" onclick="R.qAns('+i2+','+q.ans+')">'+q.opts[i2]+'</button>';
+o+='</div>';
+// Horoscope
+o+='<div class="fun-card"><div class="fun-title">&#128302; RL Horoscope</div><div style="font-size:.8rem;padding:6px;background:var(--bg3);border-radius:var(--radius-sm)">'+HOROSCOPES[doy()%HOROSCOPES.length]+'</div></div>';
+// Personality
+var ms=0,lr=0;for(var p=0;p<MECHS.length;p++){if(MECHS[p].status==="mastered")ms++;if(MECHS[p].cat==="Aerial"&&MECHS[p].status!=="later")lr++;}
+var persona=lr>3?"Aerial Maniac":ms>15?"Rotation God":ms<5?"Ball Chaser":"Grinder";
+o+='<div class="fun-card"><div class="fun-title">&#128100; RL Personality</div><div style="font-size:.95rem;font-weight:700;color:var(--accent)">'+persona+'</div></div>';
+// Tier list
+o+='<div class="fun-card"><div class="fun-title">&#128203; Rank Tierlist</div>';
+var tiers=["S","A","B","C","D"];var tCols=["#ff7675","#fdcb6e","#55efc4","#74b9ff","#a29bfe"];
+for(var t=0;t<tiers.length;t++){o+='<div class="tierlist-row"><div class="tier-label" style="background:'+tCols[t]+';color:#000">'+tiers[t]+'</div><div class="tier-items">';
+var items=S.tierlist[tiers[t]]||[];for(var it=0;it<items.length;it++)o+='<div class="tier-chip" onclick="R.rmT(\''+tiers[t]+'\','+it+')">'+esc(items[it])+'</div>';
+o+='</div></div>';}
+o+='<div style="display:flex;gap:3px;margin-top:4px"><input class="sinput" id="tlI" placeholder="Mechanic..." style="flex:1"><select class="fsel" id="tlR"><option>S</option><option>A</option><option>B</option><option>C</option><option>D</option></select><button class="btn btn-s" onclick="R.addT()">Add</button></div></div>';
+// Tip
+o+='<div class="fun-card"><div class="fun-title">&#128161; Tip of the Day</div><div style="font-size:.8rem">'+TIPS_DB[doy()%TIPS_DB.length]+'</div></div>';
+// Speed flip timer
+o+='<div class="fun-card"><div class="fun-title">&#9201; Speed Flip Timer</div><div style="font-size:.72rem;color:var(--text2);margin-bottom:6px">Time how fast you can speed flip from one end to the other!</div><div class="econ-val" id="sfTimer">0.00s</div><button class="btn btn-s" onclick="R.sfStart()" id="sfBtn">Start</button></div>';
+el.innerHTML=o;}
+function spin(){var names=[];for(var i=0;i<MECHS.length;i++)names.push(MECHS[i].n);var reels=[document.getElementById("sl1"),document.getElementById("sl2"),document.getElementById("sl3")];var c=0;var iv=setInterval(function(){for(var r=0;r<3;r++)reels[r].textContent=names[Math.floor(Math.random()*names.length)].substring(0,12);c++;if(c>15){clearInterval(iv);var pick=names[Math.floor(Math.random()*names.length)];var parts=pick.split(" ");reels[0].textContent=parts[0]||"";reels[1].textContent=parts[1]||"";reels[2].textContent=parts.slice(2).join(" ")||"!";playGoal();toast("Practice: "+pick);}},100);}
+function seededRng(seed){return function(){seed=(seed*16807+0)%2147483647;return(seed-1)/2147483646;};}
+function getBingoRank(){return S.bingoRank||S.settings.rank||"Gold";}
+function todayStr(){var d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+function getDailyBingo(){
+var rank=getBingoRank();var pool=BINGO_POOLS[rank];if(!pool||!pool.length)pool=BINGO_POOLS["Gold"];
+var ds=todayStr();if(S.bingoDate!==ds){S.bingoDate=ds;S.bingoState=[];for(var x=0;x<25;x++)S.bingoState.push(false);S.bingoState[12]=true;save();}
+var seedNum=0;for(var c=0;c<ds.length;c++)seedNum=seedNum*31+ds.charCodeAt(c);
+seedNum=seedNum+(rank.length*997);
+var rng=seededRng(Math.abs(seedNum)||1);
+var indices=[];for(var i=0;i<pool.length;i++)indices.push(i);
+for(var j=indices.length-1;j>0;j--){var k=Math.floor(rng()*j);var tmp=indices[j];indices[j]=indices[k];indices[k]=tmp;}
+var card=[];for(var p=0;p<24;p++)card.push(pool[indices[p%indices.length]]);
+card.splice(12,0,"FREE SPACE");
+return card;}
+function togB(i){if(i===12)return;S.bingoState[i]=!S.bingoState[i];save();rFun();}
+function setBR(r){S.bingoRank=r;S.bingoDate=null;S.bingoState=[];save();rFun();toast(r+" bingo loaded");}
+function resetB(){S.bingoDate=null;S.bingoState=[];save();rFun();toast("Bingo reset");}
+function qAns(s,c){toast(s===c?"Correct!":"Wrong! Answer: "+QUIZ_DATA[doy()%QUIZ_DATA.length].opts[c]);}
+function addT(){var v=document.getElementById("tlI").value;var r=document.getElementById("tlR").value;if(!v)return;if(!S.tierlist[r])S.tierlist[r]=[];S.tierlist[r].push(v);save();rFun();toast(v+" -> "+r);}
+function rmT(t,i){if(S.tierlist[t])S.tierlist[t].splice(i,1);save();rFun();}
+var sfI=null,sfS=0;
+function sfStart(){if(sfI){clearInterval(sfI);sfI=null;document.getElementById("sfBtn").textContent="Start";toast("Time: "+(sfS/100).toFixed(2)+"s");return;}sfS=0;sfI=setInterval(function(){sfS++;var el=document.getElementById("sfTimer");if(el)el.textContent=(sfS/100).toFixed(2)+"s";},10);document.getElementById("sfBtn").textContent="Stop";}
+
+// ===== SETTINGS =====
+function rSet(){var el=document.getElementById("tc-settings"),o='';
+o+='<div class="stitle">&#9881; Settings</div>';
+o+='<div class="srow"><div><div class="slbl">Theme</div></div><div class="tg">';
+o+='<div class="topt'+(S.settings.theme==="dark"?" active":"")+'" onclick="R.setTh(\'dark\')">Dark</div>';
+o+='<div class="topt'+(S.settings.theme==="amoled"?" active":"")+'" onclick="R.setTh(\'amoled\')">AMOLED</div>';
+o+='<div class="topt'+(S.settings.theme==="light"?" active":"")+'" onclick="R.setTh(\'light\')">Light</div></div></div>';
+o+='<div class="srow"><div><div class="slbl">Accent</div></div><div class="tg">';
+o+='<div class="topt'+(S.settings.accent==="orange"?" active":"")+'" onclick="R.setAc(\'orange\')">Orange</div>';
+o+='<div class="topt'+(S.settings.accent==="blue"?" active":"")+'" onclick="R.setAc(\'blue\')">Blue</div>';
+o+='<div class="topt'+(S.settings.accent==="green"?" active":"")+'" onclick="R.setAc(\'green\')">Green</div>';
+o+='<div class="topt'+(S.settings.accent==="purple"?" active":"")+'" onclick="R.setAc(\'purple\')">Purple</div></div></div>';
+o+='<div class="srow"><div><div class="slbl">Username</div></div><input class="sinput" value="'+esc(S.settings.username)+'" onchange="S.settings.username=this.value;save();toast(\'Saved\');"></div>';
+o+='<div class="srow"><div><div class="slbl">Current Rank</div></div><select class="fsel" onchange="S.settings.rank=this.value;save();toast(\'Rank updated\');">';
+for(var r=0;r<RANKS.length;r++)o+='<option'+(S.settings.rank===RANKS[r]?' selected':'')+'>'+RANKS[r]+'</option>';
+o+='</select></div>';
+o+='<div class="srow"><div><div class="slbl">Platform</div></div><div class="tg">';
+o+='<div class="topt'+(S.settings.platform==="ps5"?" active":"")+'" onclick="R.setPl(\'ps5\')">PS5</div>';
+o+='<div class="topt'+(S.settings.platform==="steamdeck"?" active":"")+'" onclick="R.setPl(\'steamdeck\')">Deck</div>';
+o+='<div class="topt'+(S.settings.platform==="both"?" active":"")+'" onclick="R.setPl(\'both\')">Both</div></div></div>';
+o+='<div class="srow"><div><div class="slbl">Sounds</div></div><div class="tg">';
+o+='<div class="topt'+(S.settings.sounds?" active":"")+'" onclick="S.settings.sounds=true;save();rSet();">On</div>';
+o+='<div class="topt'+(!S.settings.sounds?" active":"")+'" onclick="S.settings.sounds=false;save();rSet();">Off</div></div></div>';
+o+='<div class="srow"><div><div class="slbl">Animations</div></div><div class="tg">';
+o+='<div class="topt'+(S.settings.animations?" active":"")+'" onclick="S.settings.animations=true;save();rSet();">On</div>';
+o+='<div class="topt'+(!S.settings.animations?" active":"")+'" onclick="S.settings.animations=false;save();rSet();">Off</div></div></div>';
+o+='<div class="srow"><div><div class="slbl">Reset All Data</div><div class="sdesc">Cannot be undone</div></div><button class="btn btn-s btn-d" onclick="if(confirm(\'Reset all data?\')){localStorage.removeItem(\'rlhub\');location.reload();}">Reset</button></div>';
+o+='<div style="text-align:center;padding:14px;color:var(--text3);font-size:.6rem">RL HUB v1.0.0 | Rocket League Training Hub<br>Western Australia | Platform: '+S.settings.platform+'</div>';
+el.innerHTML=o;}
+function setTh(t){S.settings.theme=t;document.body.setAttribute("data-theme",t);save();rSet();toast("Theme: "+t);}
+function setAc(a){S.settings.accent=a;document.body.setAttribute("data-accent",a);save();rSet();toast("Accent: "+a);}
+function setPl(p){S.settings.platform=p;save();rSet();toast("Platform: "+p);}
+
+// Search
+function initSearch(){document.getElementById("gSearch").addEventListener("input",function(){var q=this.value.toLowerCase().trim();if(!q){renderTab(S.activeTab);return;}});}
+
+// Swipe
+function initSwipe(){var sx=0;var ids=[];for(var i=0;i<TABS.length;i++)ids.push(TABS[i].id);var app=document.getElementById("app");
+app.addEventListener("touchstart",function(e){sx=e.touches[0].clientX;},{passive:true});
+app.addEventListener("touchend",function(e){var dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>80){var idx=ids.indexOf(S.activeTab);if(dx<0&&idx<ids.length-1)switchTab(ids[idx+1]);else if(dx>0&&idx>0)switchTab(ids[idx-1]);}},{passive:true});}
+
+function init(){
+load();
+document.body.setAttribute("data-theme",S.settings.theme||"dark");
+document.body.setAttribute("data-accent",S.settings.accent||"orange");
+var ov=document.getElementById("loadOv"),bar=document.getElementById("loadBar"),txt=document.getElementById("loadTxt");
+var prog=0;var li=setInterval(function(){prog+=Math.random()*15+8;if(prog>95)prog=95;bar.style.width=prog+"%";
+if(prog<40)txt.textContent="Loading mechanics database...";
+else if(prog<70)txt.textContent="Loading cosmetics...";
+else txt.textContent="Preparing interface...";
+},120);
+setTimeout(function(){clearInterval(li);bar.style.width="100%";txt.textContent="Ready!";
+setTimeout(function(){ov.style.display="none";document.getElementById("app").style.display="block";
+rTabs();rHero();rMech();initP();initSearch();initSwipe();
+document.getElementById("logoWrap").addEventListener("click",function(){playBoost();});
+save();},400);},800);
+}
+
+window.R={
+heroTap:heroTap,heroNext:function(){S.heroIdx=(S.heroIdx+1)%Math.min(PRESETS.length,8);updH();},heroPrev:function(){S.heroIdx=(S.heroIdx-1+Math.min(PRESETS.length,8))%Math.min(PRESETS.length,8);updH();},heroGo:function(i){S.heroIdx=i;updH();},
+mfC:mfC,mfS:mfS,setMS:setMS,copyCode:copyCode,
+togOwn:togOwn,togWish:togWish,cosmF:cosmF,
+logSess:logSess,
+startTimer:startTimer,pauseTimer:pauseTimer,resetTimer:resetTimer,
+togBk:togBk,
+spin:spin,togB:togB,resetB:resetB,setBR:setBR,qAns:qAns,addT:addT,rmT:rmT,sfStart:sfStart,
+setTh:setTh,setAc:setAc,setPl:setPl
+};
+
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+})();
+</script>
+</body>
+</html>
